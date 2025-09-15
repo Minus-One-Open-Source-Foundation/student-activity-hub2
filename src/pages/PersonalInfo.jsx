@@ -1,88 +1,294 @@
 import React, { useState } from "react";
 
-export default function PersonalInfo() {
+export default function StudentProfile() {
   const [info, setInfo] = useState({
     name: "",
     dob: "",
     phone: "",
-    address: "",
+    email: "",
+    department: "",
+    regno: "",
   });
+
+  const [profilePic, setProfilePic] = useState(null);
 
   const handleChange = (e) => {
     setInfo({ ...info, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
-    alert("Personal Info Saved: " + JSON.stringify(info, null, 2));
+    alert("Student Profile Saved:\n" + JSON.stringify(info, null, 2));
+  };
+
+  const handlePicUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfilePic(URL.createObjectURL(file));
+    }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "40px",
-        background: "linear-gradient(135deg, #43cea2, #185a9d)",
-        fontFamily: "Arial, sans-serif",
-        color: "#fff",
-      }}
-    >
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>👤 Personal Information</h2>
+    <div className="profile-wrapper">
+      <h2 className="title">Student Profile</h2>
 
-      <div style={{ maxWidth: "500px", margin: "0 auto" }}>
-        <input
-          placeholder="Full Name"
-          name="name"
-          value={info.name}
-          onChange={handleChange}
-          style={inputStyle}
-        />
-        <input
-          type="date"
-          name="dob"
-          value={info.dob}
-          onChange={handleChange}
-          style={inputStyle}
-        />
-        <input
-          placeholder="Phone"
-          name="phone"
-          value={info.phone}
-          onChange={handleChange}
-          style={inputStyle}
-        />
-        <input
-          placeholder="Address"
-          name="address"
-          value={info.address}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+      <div className="profile-card">
+        <div className="profile-left">
+          <div className="pic-box">
+            {profilePic ? (
+              <img src={profilePic} alt="Profile" />
+            ) : (
+              <div className="placeholder">Upload Photo</div>
+            )}
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handlePicUpload}
+            className="upload-input"
+          />
+        </div>
 
-        <button onClick={handleSave} style={btnStyle}>
-          Save
-        </button>
+        <div className="profile-right">
+          <div className="form-group">
+            <label>Full Name</label>
+            <input
+              placeholder="Enter full name"
+              name="name"
+              value={info.name}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Date of Birth</label>
+              <input
+                type="date"
+                name="dob"
+                value={info.dob}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="form-group">
+              <label>Register Number</label>
+              <input
+                placeholder="Enter register number"
+                name="regno"
+                value={info.regno}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Phone Number</label>
+              <input
+                placeholder="Enter phone number"
+                name="phone"
+                value={info.phone}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                placeholder="Enter email"
+                name="email"
+                value={info.email}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Department</label>
+            <input
+              placeholder="Enter department"
+              name="department"
+              value={info.department}
+              onChange={handleChange}
+            />
+          </div>
+
+          <button className="save-btn" onClick={handleSave}>
+            Save Profile
+          </button>
+        </div>
       </div>
+
+      <style>{`
+        :root {
+          --primary: #185a9d;
+          --secondary: #43cea2;
+          --text-dark: #222;
+          --text-light: #555;
+          --border: #ddd;
+          --button-gradient: linear-gradient(90deg, #ff6a00, #ee0979);
+        }
+
+        .profile-wrapper {
+          min-height: 100vh;
+          padding: 40px 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          background: #f5f7fa;
+          font-family: "Inter", system-ui, sans-serif;
+          color: var(--text-dark);
+        }
+
+        .title {
+          font-size: 2.4rem;
+          font-weight: 700;
+          margin-bottom: 30px;
+          color: var(--primary);
+          letter-spacing: 0.5px;
+          position: relative;
+        }
+
+        .title::after {
+          content: "";
+          width: 120px;
+          height: 4px;
+          background: var(--secondary);
+          display: block;
+          margin: 8px auto 0;
+          border-radius: 2px;
+        }
+
+        .profile-card {
+          background: #ffffff;
+          border: 1px solid var(--border);
+          border-radius: 20px; /* slightly bigger corners */
+          padding: 3rem; /* bigger padding */
+          width: 100%;
+          max-width: 1100px; /* bigger max width */
+          min-height: 70vh; /* make card taller */
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          display: flex;
+          gap: 2.5rem; /* more spacing */
+          animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .profile-left {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .pic-box {
+          width: 180px; /* slightly bigger photo */
+          height: 180px;
+          border-radius: 50%;
+          overflow: hidden;
+          border: 2px solid var(--border);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #e0e0e0;
+          margin-bottom: 12px;
+          position: relative;
+        }
+
+        .pic-box img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .placeholder {
+          color: var(--text-light);
+          font-size: 0.95rem;
+        }
+
+        .upload-input {
+          font-size: 0.9rem;
+          margin-top: 8px;
+          cursor: pointer;
+        }
+
+        .profile-right {
+          flex: 2;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .form-group {
+          margin-bottom: 1.6rem; /* more spacing between fields */
+          display: flex;
+          flex-direction: column;
+        }
+
+        .form-group label {
+          margin-bottom: 6px;
+          font-weight: 600;
+          font-size: 0.95rem;
+          color: var(--text-dark);
+        }
+
+        .form-group input {
+          width: 100%;
+          padding: 16px; /* bigger input */
+          border-radius: 10px;
+          border: 1px solid var(--border);
+          outline: none;
+          font-size: 16px;
+          background: #fafafa;
+          transition: all 0.25s ease;
+        }
+
+        .form-group input:focus {
+          border-color: var(--primary);
+          background: #fff;
+          box-shadow: 0 0 0 3px rgba(24, 90, 157, 0.2);
+        }
+
+        .form-row {
+          display: flex;
+          gap: 1.2rem;
+        }
+
+        .save-btn {
+          margin-top: 24px;
+          align-self: flex-end;
+          padding: 16px 32px; /* bigger button */
+          border: none;
+          border-radius: 14px;
+          background: var(--button-gradient);
+          color: #fff;
+          font-weight: 700;
+          font-size: 17px;
+          cursor: pointer;
+          box-shadow: 0 10px 30px rgba(238,9,121,0.2);
+          transition: transform 0.15s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .save-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 34px rgba(238,9,121,0.3);
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+          .profile-card {
+            flex-direction: column;
+          }
+          .form-row {
+            flex-direction: column;
+          }
+          .save-btn {
+            width: 100%;
+            align-self: center;
+          }
+        }
+      `}</style>
     </div>
   );
 }
-
-const inputStyle = {
-  display: "block",
-  width: "100%",
-  padding: "12px",
-  marginBottom: "15px",
-  borderRadius: "8px",
-  border: "none",
-  outline: "none",
-  fontSize: "14px",
-};
-
-const btnStyle = {
-  width: "100%",
-  padding: "12px",
-  background: "#ffd369",
-  border: "none",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "bold",
-};
