@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   const [personalInfo] = useState({
     name: "John Doe",
     dob: "2000-01-01",
@@ -9,17 +12,21 @@ export default function Dashboard() {
   });
 
   const [activities, setActivities] = useState([
-    { id: 1, title: "Hackathon", description: "Participated in SIH Hackathon", category: "Competition", status: "Approved" },
+    { id: 1, title: "Hackathon", description: "Participated in SIH Hackathon", category: "Hackathon", status: "Approved" },
     { id: 2, title: "Workshop", description: "Attended AI Workshop", category: "Workshop", status: "Pending" },
+    { id: 3, title: "Internship", description: "Summer internship at Infosys", category: "Internship", status: "Approved" },
   ]);
 
   const [newActivity, setNewActivity] = useState({ title: "", description: "", category: "", file: null });
   const [showForm, setShowForm] = useState(false);
 
-  const totalActivities = activities.length;
+  const hackathonWorkshops = activities.filter(
+    (a) => a.category === "Hackathon" || a.category === "Workshop"
+  ).length;
+
+  const internships = activities.filter((a) => a.category === "Internship").length;
+
   const achievements = activities.filter((a) => a.status === "Approved").length;
-  const pendingActivities = activities.filter((a) => a.status === "Pending").length;
-  const portfolioItems = achievements + pendingActivities;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -55,10 +62,25 @@ export default function Dashboard() {
       {/* Stats Section */}
       <section className="stats-section">
         <div className="stats-grid">
-          <div className="glass-card"><h3>Academic Records</h3><p className="stat-value">—</p></div>
-          <div className="glass-card"><h3>Total Activities</h3><p className="stat-value">{totalActivities}</p></div>
-          <div className="glass-card"><h3>Approved Achievements</h3><p className="stat-value">{achievements}</p></div>
-          <div className="glass-card"><h3>Portfolio Items</h3><p className="stat-value">{portfolioItems}</p></div>
+          <div className="glass-card">
+            <h3>Academic Records</h3>
+            <p className="stat-value">—</p>
+          </div>
+
+          <div className="glass-card" onClick={() => navigate("/hackathons-workshops")} style={{ cursor: "pointer" }}>
+            <h3>Hackathons & Workshops</h3>
+            <p className="stat-value">{hackathonWorkshops}</p>
+          </div>
+
+          <div className="glass-card" onClick={() => navigate("/internships")} style={{ cursor: "pointer" }}>
+            <h3>Internships</h3>
+            <p className="stat-value">{internships}</p>
+          </div>
+
+          <div className="glass-card">
+            <h3>Approved Achievements</h3>
+            <p className="stat-value">{achievements}</p>
+          </div>
         </div>
       </section>
 
@@ -103,8 +125,8 @@ export default function Dashboard() {
               <label>Category:
                 <select value={newActivity.category} onChange={e => setNewActivity({...newActivity, category:e.target.value})} required>
                   <option value="">Select</option>
+                  <option value="Hackathon">Hackathon</option>
                   <option value="Workshop">Workshop</option>
-                  <option value="Competition">Competition</option>
                   <option value="Internship">Internship</option>
                   <option value="Certification">Certification</option>
                 </select>
@@ -121,7 +143,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Styles */}
+      {/* Inline Styles */}
       <style>{`
         :root {
           --card-bg: #f4f4f4;
@@ -136,7 +158,7 @@ export default function Dashboard() {
           padding:4rem 1.5rem 2rem;
           font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
           color:#111;
-          background:#fff; /* White background */
+          background:#fff;
           display:flex;
           flex-direction:column;
           align-items:center;
@@ -148,7 +170,6 @@ export default function Dashboard() {
         .stats-section{ width:100%; max-width:920px; margin-bottom:2rem; }
         .stats-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
 
-        /* Purple gradient cards with yellow numbers */
         .glass-card{
           background: linear-gradient(to right, #6366f1, #8b5cf6, #6366f1);
           color: #fff;

@@ -4,7 +4,6 @@ import { useAuth } from "../contexts/AuthContext";
 export default function Sidebar() {
   const { logout } = useAuth();
   const navigate = useNavigate();
-
   const accentGradient = "linear-gradient(90deg,#ff6a00,#ee0979)";
 
   const linkStyle = {
@@ -16,56 +15,39 @@ export default function Sidebar() {
     background: "rgba(255,255,255,0.08)",
     transition: "box-shadow 0.22s, background 0.18s",
     border: "1px solid rgba(255,255,255,0.12)",
-    fontSize: "1rem"
+    fontSize: "1rem",
   };
 
   const activeStyle = {
     background: "rgba(255,255,255,0.12)",
     boxShadow: "0 8px 26px rgba(238,9,121,0.13)",
-    borderColor: "#ffd700"
+    borderColor: "#ffd700",
   };
 
+  const navItems = [
+    { to: "/", label: "Dashboard" },
+    { to: "/personal-info", label: "Personal Info" },
+    { to: "/academic-records", label: "Academic Records" },
+    { to: "/hackathons-workshops", label: "Hackathons & Workshops" }, // Added
+    { to: "/internships", label: "Internships" }, // Added
+    { to: "/activities", label: "Activities" },
+    { to: "/achievements", label: "Achievements" },
+    { to: "/portfolio", label: "Portfolio" },
+    { to: "/analytics", label: "Analytics" },
+  ];
+
   return (
-    <div
-      style={{
-        width: "238px",
-        background: "linear-gradient(135deg,#667eea 0%,#764ba2 100%)",
-        color: "#fff",
-        minHeight: "100vh",
-        padding: "22px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
-      }}
-    >
-      <div>
-        <h2 style={{
-          marginBottom: "26px",
-          textAlign: "center",
-          fontWeight: 700,
-          fontSize: "1.46rem",
-          lineHeight:"1.08",
-          background: "linear-gradient(90deg,#fff,#ffd700)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent"
-        }}>
-           Student Hub
-        </h2>
-        <nav style={{display:"flex",flexDirection:"column",gap:"10px"}}>
-          {[
-            { to: "/", label: "Dashboard" },
-            { to: "/personal-info", label: "Personal Info" },
-            { to: "/academic-records", label: "Academic Records" },
-            { to: "/activities", label: "Activities" },
-            { to: "/achievements", label: "Achievements" },
-            { to: "/portfolio", label: "Portfolio" },
-            { to: "/analytics", label: "Analytics" }
-          ].map((item, i) => (
+    <div className="sidebar">
+      <div className="sidebar-top">
+        <h2 className="sidebar-title">Student Hub</h2>
+        <nav className="sidebar-nav">
+          {navItems.map((item, i) => (
             <NavLink
               key={i}
               to={item.to}
-              style={({ isActive }) => (isActive ? { ...linkStyle, ...activeStyle } : linkStyle)}
+              style={({ isActive }) =>
+                isActive ? { ...linkStyle, ...activeStyle } : linkStyle
+              }
             >
               {item.label}
             </NavLink>
@@ -74,28 +56,73 @@ export default function Sidebar() {
       </div>
 
       <button
-        onClick={() => { logout(); navigate("/login"); }}
-        style={{
-          marginBottom: "60px",
-          background: accentGradient,
-          border: "none",
-          padding: "13px 20px",
-          color: "#fff",
-          borderRadius: "12px",
-          cursor: "pointer",
-          fontWeight: 700,
-          fontSize: "1rem",
-          boxShadow: "0 8px 26px rgba(238,9,121,0.13)",
-          transition: "transform .13s"
+        className="logout-btn"
+        onClick={() => {
+          logout();
+          navigate("/login");
         }}
       >
         Logout
       </button>
 
       <style>{`
-        @media (max-width:520px){
-          div[style] { width:100vw !important; padding:1rem !important; }
-          h2 { font-size:1.15rem !important;}
+        .sidebar {
+          width: 238px;
+          min-width: 238px;
+          background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+          color: #fff;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          padding: 22px;
+          box-sizing: border-box;
+          font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+        }
+
+        .sidebar-top {
+          flex: 1;
+          overflow-y: auto;
+        }
+
+        .sidebar-title {
+          margin-bottom: 26px;
+          text-align: center;
+          font-weight: 700;
+          font-size: 1.46rem;
+          line-height: 1.08;
+          background: linear-gradient(90deg,#fff,#ffd700);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-nav {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .logout-btn {
+          margin-top: 20px;
+          background: ${accentGradient};
+          border: none;
+          padding: 13px 20px;
+          color: #fff;
+          border-radius: 12px;
+          cursor: pointer;
+          font-weight: 700;
+          font-size: 1rem;
+          box-shadow: 0 8px 26px rgba(238,9,121,0.13);
+          transition: transform .13s, box-shadow .2s;
+        }
+
+        .logout-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 30px rgba(238,9,121,0.18);
+        }
+
+        @media (max-width: 520px) {
+          .sidebar { width: 100vw; min-width: 100vw; padding: 1rem; }
+          .sidebar-title { font-size: 1.15rem; }
         }
       `}</style>
     </div>
