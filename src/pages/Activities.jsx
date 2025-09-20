@@ -49,7 +49,8 @@ export default function Activities() {
         .activities-wrapper {
           min-height: 100vh;
           padding: 3rem 2rem;
-          background: #ffffff;
+          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background-size: cover;
           font-family: 'Inter', sans-serif;
           color: #333;
         }

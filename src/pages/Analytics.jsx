@@ -9,6 +9,8 @@ export default function Analytics() {
     { name: "Portfolio Items", value: 4 },
   ];
 
+  const total = data.reduce((acc, cur) => acc + cur.value, 0);
+
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   return (
@@ -20,12 +22,25 @@ export default function Analytics() {
 
       <div className="chart-card">
         <PieChart width={400} height={300}>
-          <Pie data={data} dataKey="value" cx="50%" cy="50%" outerRadius={100} label>
+          <Pie
+            data={data}
+            dataKey="value"
+            cx="50%"
+            cy="50%"
+            outerRadius={100}
+            label={({ name, value }) =>
+              `${((value / total) * 100).toFixed(1)}%`
+            }
+          >
             {data.map((entry, i) => (
               <Cell key={i} fill={COLORS[i % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip />
+          <Tooltip
+            formatter={(value, name) =>
+              [`${value} (${((value / total) * 100).toFixed(1)}%)`, name]
+            }
+          />
           <Legend />
         </PieChart>
       </div>
@@ -34,7 +49,8 @@ export default function Analytics() {
         .analytics-wrapper {
           min-height: 100vh;
           padding: 3rem 2rem;
-          background: #ffffff;
+          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background-size: cover;
           font-family: 'Inter', sans-serif;
           display: flex;
           flex-direction: column;
