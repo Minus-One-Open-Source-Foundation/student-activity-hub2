@@ -134,7 +134,7 @@ export default function StudentProfile() {
         }
 
         .profile-wrapper {
-          min-height: vh;
+          min-height: 100vh;
           padding: 40px 20px;
           display: flex;
           flex-direction: column;
