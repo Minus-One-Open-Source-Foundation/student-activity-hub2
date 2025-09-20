@@ -165,10 +165,10 @@ export default function StudentProfile() {
           padding: 3rem; /* bigger padding */
           width: 100%;
           max-width: 1100px; /* bigger max width */
-          min-height: 70vh; /* make card taller */
+          min-height: 60vh; /* make card taller */
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
           display: flex;
-          gap: 2.5rem; /* more spacing */
+          gap:2.5rem; /* more spacing */
           animation: fadeIn 0.5s ease-in-out;
         }
 
@@ -217,7 +217,7 @@ export default function StudentProfile() {
         }
 
         .form-group {
-          margin-bottom: 1.6rem; /* more spacing between fields */
+          margin-bottom: 2.4rem; /* more spacing between fields */
           display: flex;
           flex-direction: column;
         }
@@ -248,7 +248,7 @@ export default function StudentProfile() {
 
         .form-row {
           display: flex;
-          gap: 1.2rem;
+          gap: 2.4rem;
         }
 
         .save-btn {
