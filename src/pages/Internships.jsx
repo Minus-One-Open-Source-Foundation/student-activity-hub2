@@ -71,17 +71,16 @@ export default function Internships() {
       {/* Header */}
       <header style={{ textAlign: "center", marginBottom: "2rem" }}>
         <h1
-          style={{
-            fontSize: "2.5rem",
-            fontWeight: 700,
-            background: "linear-gradient(90deg,#ff6a00,#ee0979)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            marginBottom: "0.5rem",
-          }}
-        >
-          Internships
-        </h1>
+        style={{
+        fontSize: "2.5rem",
+        fontWeight: 700,
+        color: "#111", // changed to black
+        marginBottom: "0.5rem",
+      }}
+     >
+        Internships
+       </h1>
+
         <p style={{ fontSize: "1rem", color: "#080606ff", marginBottom: "1rem" }}>
           Manage your internship experiences
         </p>
