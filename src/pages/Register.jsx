@@ -51,27 +51,29 @@ export default function Register() {
     setFeedback({ text: `OTP sent (mock): ${otp}`, type: "info" });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) {
       setFeedback({ text: "Please fix form errors", type: "error" });
       return;
     }
+    
     setLoading(true);
-    Promise.resolve(register(form.name, form.email, form.password))
-      .then((success) => {
-        setLoading(false);
-        if (success) {
-          setFeedback({ text: "Registered successfully! Redirecting to login...", type: "success" });
-          setTimeout(() => navigate("/login"), 900);
-        } else {
-          setFeedback({ text: "Email already exists", type: "error" });
-        }
-      })
-      .catch((err) => {
-        setLoading(false);
-        setFeedback({ text: err?.message || "Registration failed", type: "error" });
+    setFeedback(null);
+
+    try {
+      await register(form.name, form.email, form.password);
+      setFeedback({ text: "Registration successful! Redirecting to login...", type: "success" });
+      setTimeout(() => navigate("/login"), 1500);
+    } catch (error) {
+      console.error('Registration error:', error);
+      setFeedback({ 
+        text: error.message || "Registration failed. Please try again.", 
+        type: "error" 
       });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

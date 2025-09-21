@@ -26,7 +26,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) {
       setFeedback({ text: "Please fix the errors above", type: "error" });
@@ -34,21 +34,20 @@ export default function Login() {
     }
 
     setLoading(true);
-    // handle both sync and async login functions
-    Promise.resolve(login(form.email, form.password))
-      .then((success) => {
-        setLoading(false);
-        if (success) {
-          setFeedback({ text: "Login successful — redirecting...", type: "success" });
-          setTimeout(() => navigate("/"), 900);
-        } else {
-          setFeedback({ text: "Invalid email or password", type: "error" });
-        }
-      })
-      .catch((err) => {
-        setLoading(false);
-        setFeedback({ text: err?.message || "Login failed", type: "error" });
+    setFeedback(null);
+
+    try {
+      await login(form.email, form.password);
+      setFeedback({ text: "Login successful — redirecting...", type: "success" });
+      setTimeout(() => navigate("/"), 900);
+    } catch (error) {
+      setFeedback({ 
+        text: error.response?.data?.message || error.message || "Login failed. Please check your credentials.", 
+        type: "error" 
       });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
