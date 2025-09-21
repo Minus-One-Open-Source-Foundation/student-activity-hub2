@@ -1,0 +1,115 @@
+/* src/styles/faculty.css */
+/* Matches App.css simple style, reuses .card-like blocks */
+
+/* Page container */
+.faculty-dashboard {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center; /* consistent with student dashboard */
+}
+
+/* Section header */
+.faculty-dashboard h4 {
+  margin-bottom: 1.2rem;
+  color: #1976d2; /* your theme primary blue */
+}
+
+/* Approvals grid */
+.faculty-approvals-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+}
+
+/* Card style similar to .card in App.css */
+.approval-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+  text-align: left; /* card contents left aligned */
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.approval-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  transform: translateY(-3px);
+}
+
+/* Title and student info */
+.approval-card .title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #111827;
+}
+
+.approval-card .student-line {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.8rem;
+}
+
+/* Description */
+.approval-card .desc {
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 0.8rem;
+  white-space: pre-wrap;
+}
+
+/* Attachments */
+.approval-card .attachments {
+  margin-top: 0.6rem;
+}
+
+.approval-card .attachments a {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: #1976d2;
+  text-decoration: underline;
+  margin-right: 8px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Action buttons */
+.approval-card .actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.approval-card .actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+}
+
+.approval-card .actions .approve {
+  background-color: #1976d2;
+  color: #fff;
+}
+
+.approval-card .actions .reject {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.approval-card .actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Reject reason box */
+.approval-card .reject-reason {
+  margin-top: 1rem;
+}   

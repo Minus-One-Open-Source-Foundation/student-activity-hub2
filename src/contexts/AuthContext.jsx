@@ -4,17 +4,22 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   // default test user
-  const defaultUser = { email: "student@test.com", password: "12345678" };
+  // const defaultUser = { email: "student@test.com", password: "12345678" };
+  // const defaultFaculty = { email: "faculty@test.com", password: "  // ...existing code...
+  const defaultUser = { email: "student@test.com", password: "12345678", role: "student", name: "John Doe" };
+  const defaultFaculty = { email: "faculty@test.com", password: "faculty123", role: "faculty", name: "Faculty Name" };
+  // ...existing code...", role: "faculty" };
 
   const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([defaultUser]); // store multiple users in memory
+  const [users, setUsers] = useState([defaultUser,defaultFaculty]); // store multiple users in memory
+ 
 
   const login = (email, password) => {
     const existingUser = users.find(
       (u) => u.email === email && u.password === password
     );
     if (existingUser) {
-      setUser({ email: existingUser.email });
+      setUser(existingUser);
       return true;
     }
     return false;
