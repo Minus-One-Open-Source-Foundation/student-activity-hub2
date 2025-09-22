@@ -12,7 +12,6 @@ import {
   Stack,
   Divider,
 } from "@mui/material";
-import "../../styles/faculty.css";
 
 export default function ApprovalCard({ activity, onApprove, onReject }) {
   const [showReason, setShowReason] = useState(false);
