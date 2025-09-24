@@ -138,7 +138,13 @@ export default function HackWorkshops() {
           color: #111;
         }
         header { text-align: center; margin-bottom: 2.5rem; }
-        header h1 { font-size: 2.2rem; font-weight: 700; background: linear-gradient(90deg,#ff6a00,#ee0979); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
+        header h1 {
+          font-size: 2.2rem;
+          font-weight: 700;
+          color: #111; /* change from gradient to black */
+          margin-bottom: 0.5rem;
+          }
+
         header p { font-size: 1rem; color: #555; margin-bottom: 1rem; }
 
         .top-controls { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:1rem; margin-bottom:1.5rem; }
@@ -171,7 +177,7 @@ export default function HackWorkshops() {
         .modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus { border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.15); }
         .modal-buttons { display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1rem; }
         .primary-btn { background: linear-gradient(90deg,#ff6a00,#ee0979); border:none; color:#fff; font-weight:600; padding:0.75rem 1.5rem; border-radius:14px; cursor:pointer; font-size:1rem; }
-        .primary-btn:hover { transform: translateY(-2px); box-shadow:0 10px 26px rgba(238,9,121,0.25); }
+        .primary-btn:hover { transform: translateY(-2px); box-shadow:0 10px 26px rgba(128, 33, 33, 0.25); }
         .ghost-btn { background:transparent; border:none; color:#555; text-decoration:underline; cursor:pointer; font-size:1rem; padding:0.75rem 1.5rem; }
 
         @keyframes slideDown { from{opacity:0; transform:translateY(-20px);} to{opacity:1; transform:translateY(0);} }

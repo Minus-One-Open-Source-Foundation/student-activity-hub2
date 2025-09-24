@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api", // Spring Boot backend
+  baseURL: "http://98.70.26.80:8058/api/", // Spring Boot backend
 });
 
 // Add token to requests if available
@@ -32,19 +32,37 @@ export const authAPI = {
   },
   
   register: async (name, email, password) => {
+    const requestData = { 
+      username: name,  // Your DTO expects 'username', not 'name'
+      email, 
+      password,
+      role: "STUDENT"  // Your DTO requires a 'role' field
+    };
+    console.log('Sending registration request:', requestData); // Debug log
+    
     try {
-      const response = await api.post('/auth/register', { 
-        name, 
-        email, 
-        password 
-      });
+      const response = await api.post('/auth/register', requestData);
+      console.log('API register response status:', response.status); // Debug log
+      console.log('API register response data:', response.data); // Debug log
+      
+      // If we get here, the request was successful (status 200-299)
       return response.data;
     } catch (error) {
-      // Handle HTTP error responses  
+      console.error('API register error:', error); // Debug log
+      
+      // Only throw for actual HTTP errors (400, 500, etc.)
       if (error.response) {
-        throw error.response.data;
+        // This is an HTTP error response from your backend
+        console.log('Error response status:', error.response.status);
+        console.log('Error response data:', error.response.data);
+        
+        // Extract the actual error message from your AuthResponse
+        const errorMessage = error.response.data?.message || 'Registration failed';
+        throw new Error(errorMessage);
       }
-      throw error;
+      
+      // Network error
+      throw new Error('Network error - please check your connection');
     }
   }
 };

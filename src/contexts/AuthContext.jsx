@@ -46,14 +46,16 @@ export function AuthProvider({ children }) {
   const register = async (name, email, password) => {
     try {
       const response = await authAPI.register(name, email, password);
+      console.log('Registration response:', response); // Debug log
       
-      if (response.success) {
-        return true;
-      } else {
-        throw new Error(response.message || 'Registration failed');
-      }
+      // If we get here without an exception, it means the HTTP request was successful (200/201)
+      // Your Spring Boot controller returns ResponseEntity.ok() for success
+      // So if no exception was thrown, registration was successful
+      return true;
+      
     } catch (error) {
       console.error('Registration error:', error);
+      // Only throw error if there was actually an HTTP error (400, 500, etc.)
       throw error;
     }
   };

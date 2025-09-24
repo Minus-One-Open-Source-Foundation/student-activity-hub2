@@ -63,7 +63,12 @@ export default function Dashboard() {
         {/* Stats Section */}
         <section className="stats-section">
         <div className="stats-grid">
-          <div className="glass-card">
+        {/* Academic Records Card */}
+          <div
+            className="glass-card"
+            onClick={() => navigate("/academic-records")}
+            style={{ cursor: "pointer" }}
+            >
             <h3>Academic Records</h3>
             <p className="stat-value">—</p>
           </div>
@@ -171,7 +176,7 @@ export default function Dashboard() {
           width: 100%;
           max-width: 1200px;
           margin: 0 auto;
-          padding: 2rem 1.5rem 1rem;
+          padding: 9rem 1.5rem 1rem;
           display: flex;
           flex-direction: column;
           align-items: center;

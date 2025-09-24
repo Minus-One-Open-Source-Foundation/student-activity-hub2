@@ -125,7 +125,7 @@ export default function StudentProfile() {
 
       <style>{`
         :root {
-          --primary: #185a9d;
+          --primary: #090b0dff;
           --secondary: #43cea2;
           --text-dark: #222;
           --text-light: #555;
