@@ -9,21 +9,27 @@ export default function Layout({ children }) {
 
       <style>{`
         /* Layout container */
+
         .layout-wrapper {
           display: flex;
           min-height: 100vh;
           width: 100%;
-          background: #f5f7fa; /* page background */
+          background: none;
           font-family: 'Inter', sans-serif;
         }
 
         /* Main content area */
+
         .content {
           flex: 1;
-          padding: 2rem 2.5rem; /* consistent spacing */
+          padding: 0;
           overflow-y: auto;
           min-height: 100vh;
           box-sizing: border-box;
+          background: url('/src/assets/bg.jpg') no-repeat center center fixed;
+          background-size: cover;
+          display: flex;
+          flex-direction: column;
         }
 
         /* Optional: smooth scroll for content */
@@ -44,7 +50,7 @@ export default function Layout({ children }) {
             flex-direction: column;
           }
           .content {
-            padding: 1.2rem 1rem;
+            padding: 0;
           }
         }
       `}</style>

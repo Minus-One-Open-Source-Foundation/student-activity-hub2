@@ -1,4 +1,5 @@
 import React from "react";
+
 export default function AcademicRecords() {
   const semesters = [
     { id: 1, file: "sem1.pdf" },
@@ -10,10 +11,11 @@ export default function AcademicRecords() {
     { id: 7, file: null },
     { id: 8, file: null },
   ];
+
   const handleClick = (sem) => {
     if (sem.file) {
       const link = document.createElement("a");
-      link.href = `/${sem.file}`; // Place PDFs in public folder with these names
+      link.href = `/${sem.file}`;
       link.download = sem.file;
       document.body.appendChild(link);
       link.click();
@@ -22,12 +24,14 @@ export default function AcademicRecords() {
       alert(`Marksheet for Semester ${sem.id} is not yet uploaded.`);
     }
   };
+
   return (
     <div className="records-wrapper">
       <header>
         <h1>Academic Records</h1>
         <p>Click on a semester to view or download the marksheet</p>
       </header>
+
       <section className="cards-container">
         {semesters.map((sem) => (
           <div
@@ -37,80 +41,111 @@ export default function AcademicRecords() {
           >
             <h3>Semester {sem.id}</h3>
             {sem.file ? (
-              <span className="grade">Click to Download</span>
+              <span className="status uploaded">Download</span>
             ) : (
-              <span className="grade not-uploaded-text">Not Yet Uploaded</span>
+              <span className="status not-uploaded-text">Not Uploaded</span>
             )}
           </div>
         ))}
       </section>
+
+      {/* Inline Styles */}
       <style>{`
         .records-wrapper {
-          min-height: calc(100vh - 3cm);
-          padding: 3rem 2rem 1cm 2rem;
-          background: linear-gradient(135deg,#f5f7fa,#e0e0e0);
-          font-family: 'Inter', sans-serif;
-          color: #111;
+          min-height: 100vh;
+          padding: 3rem 1.5rem;
+          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background-size: cover;
+          font-family: "Inter", sans-serif;
+          color: #222;
         }
+
         header {
           text-align: center;
-          margin-bottom: 1.5rem;
+          margin-bottom: 3rem;
         }
+
         header h1 {
-          font-size: 2.2rem;
+          font-size: 2.5rem;
           font-weight: 700;
-          background: linear-gradient(90deg,#ff6a00,#ee0979);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: #1e293b;
+          margin-bottom: 0.5rem;
         }
+
         header p {
           font-size: 1rem;
-          color: #555;
+          color: #475569;
         }
+
         .cards-container {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 1.5rem;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 2rem;
+          max-width: 1000px;
+          margin: 0 auto;
         }
+
         .record-card {
-          background: #fff;
+          background: #ffffff;
           border-radius: 16px;
-          padding: 2rem;
-          box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+          padding: 2rem 1.5rem;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: transform 0.25s, box-shadow 0.25s;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
           text-align: center;
         }
+
         .record-card:hover {
           transform: translateY(-6px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
         }
+
         .record-card h3 {
-          margin: 0 0 0.5rem;
+          margin-bottom: 1rem;
           font-size: 1.3rem;
-          font-weight: 700;
+          font-weight: 600;
+          color: #0f172a;
         }
-        .grade {
-          font-size: 1rem;
-          color: #555;
-          background: #f0f0f0;
-          padding: 0.3rem 0.8rem;
-          border-radius: 8px;
+
+        .status {
+          display: inline-block;
+          font-size: 0.95rem;
+          font-weight: 600;
+          padding: 0.5rem 1rem;
+          border-radius: 10px;
+          transition: background 0.3s, color 0.3s;
         }
+
+        .uploaded {
+          background: #e0f2fe;
+          color: #0369a1;
+        }
+
+        .record-card:hover .uploaded {
+          background: #bae6fd;
+          color: #075985;
+        }
+
         .not-uploaded {
-          opacity: 0.7;
-          background: #f8f8f8;
+          opacity: 0.85;
         }
+
         .not-uploaded-text {
-          color: #999;
-          background: #ececec;
+          background: #f1f5f9;
+          color: #64748b;
         }
-        @media(max-width:600px){
-          .cards-container { grid-template-columns: 1fr; }
+
+        @media (max-width: 600px) {
+          .cards-container {
+            grid-template-columns: 1fr;
+          }
+          header h1 {
+            font-size: 2rem;
+          }
         }
       `}</style>
     </div>

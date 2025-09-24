@@ -56,13 +56,19 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-wrapper">
-      <h1 className="title">Welcome, <span>{personalInfo.name}</span></h1>
-      <p className="subtitle">Student Dashboard</p>
+      <div className="dashboard-content">
+        <h1 className="title">Welcome, <span>{personalInfo.name}</span></h1>
+        <p className="subtitle">Student Dashboard</p>
 
-      {/* Stats Section */}
-      <section className="stats-section">
+        {/* Stats Section */}
+        <section className="stats-section">
         <div className="stats-grid">
-          <div className="glass-card">
+        {/* Academic Records Card */}
+          <div
+            className="glass-card"
+            onClick={() => navigate("/academic-records")}
+            style={{ cursor: "pointer" }}
+            >
             <h3>Academic Records</h3>
             <p className="stat-value">—</p>
           </div>
@@ -84,8 +90,8 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Activity Section */}
-      <section className="activity-section">
+        {/* Activity Section */}
+        <section className="activity-section">
         <div className="activity-header">
           <h2>Activity Overview</h2>
           <button className="primary-btn" onClick={() => setShowForm(true)}>Add Activity</button>
@@ -105,15 +111,15 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Download Button */}
-      <div className="download-btn">
+        {/* Download Button */}
+        <div className="download-btn">
         <button className="primary-btn" onClick={handleDownloadPortfolio}>Download Portfolio</button>
       </div>
 
-      {/* Modal for Adding Activity */}
-      {showForm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        {/* Modal for Adding Activity */}
+        {showForm && (
+          <div className="modal-overlay">
+            <div className="modal-content">
             <h3>Add New Activity</h3>
             <form onSubmit={handleSubmit}>
               <label>Title:
@@ -154,19 +160,27 @@ export default function Dashboard() {
         *{box-sizing:border-box}
         body{margin:0}
         .dashboard-wrapper {
-         min-height:100vh;
-         padding:2rem 1.5rem 1rem;
-         font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-         color:#111;
-         background: url("/src/assets/bg.jpg") no-repeat center center fixed;
-         background-size: cover;
-         display:flex;
-         flex-direction:column;
-         align-items:center;
-         text-align:center;
-         justify-content:flex-start;
-         }
-
+          min-height: 100vh;
+          width: 100%;
+          height: 100vh;
+          font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+          color:#111;
+          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background-size: cover;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          justify-content: flex-start;
+        }
+        .dashboard-content {
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 9rem 1.5rem 1rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
         .title{ font-size:2rem; margin:0 0 0.3rem; font-weight:700; color:#111; }
         .subtitle{ font-size:1rem; margin:0 0 1.5rem; color:rgba(0,0,0,0.7); }
 
@@ -218,6 +232,7 @@ export default function Dashboard() {
 
         @media (max-width:520px){ .stats-grid{ grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); } }
       `}</style>
+      </div>
     </div>
   );
 }

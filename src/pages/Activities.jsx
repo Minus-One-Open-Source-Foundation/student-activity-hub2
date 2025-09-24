@@ -49,7 +49,8 @@ export default function Activities() {
         .activities-wrapper {
           min-height: 100vh;
           padding: 3rem 2rem;
-          background: #ffffff;
+          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background-size: cover;
           font-family: 'Inter', sans-serif;
           color: #333;
         }
@@ -60,13 +61,15 @@ export default function Activities() {
         }
 
         header h1 {
-          font-size: 2rem;
-          font-weight: 700;
-          background: linear-gradient(90deg,#6a11cb,#2575fc);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+         font-size: 2rem;
+         font-weight: 700;
+         color: #000; /* changed to black */
+         background: none;
+         -webkit-background-clip: initial;
+         -webkit-text-fill-color: initial;
           margin-bottom: 0.5rem;
-        }
+         }
+
 
         header p {
           font-size: 1rem;

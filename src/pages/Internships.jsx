@@ -15,6 +15,8 @@ export default function Internships() {
   ]);
 
   const [showForm, setShowForm] = useState(false);
+  const [openCard, setOpenCard] = useState(null);
+  const [search, setSearch] = useState("");
   const [newInternship, setNewInternship] = useState({
     company: "",
     role: "",
@@ -24,13 +26,11 @@ export default function Internships() {
     file: null,
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setNewInternship({ ...newInternship, [e.target.name]: e.target.value });
-  };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = (e) =>
     setNewInternship({ ...newInternship, file: e.target.files[0] });
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -52,20 +52,100 @@ export default function Internships() {
     setShowForm(false);
   };
 
+  const filteredInternships = internships.filter(
+    (intern) =>
+      intern.company.toLowerCase().includes(search.toLowerCase()) ||
+      intern.role.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="intern-wrapper">
-      <header>
-        <h1>Internships</h1>
-        <p>Manage your internship experiences and details</p>
-        <button className="add-btn" onClick={() => setShowForm(true)}>
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: "2rem",
+        fontFamily: "'Inter', sans-serif",
+        background: `url("/src/assets/bg.jpg") no-repeat center center fixed`,
+        backgroundSize: "cover",
+      }}
+    >
+      {/* Header */}
+      <header style={{ textAlign: "center", marginBottom: "2rem" }}>
+        <h1
+        style={{
+        fontSize: "2.5rem",
+        fontWeight: 700,
+        color: "#111", // changed to black
+        marginBottom: "0.5rem",
+      }}
+     >
+        Internships
+       </h1>
+
+        <p style={{ fontSize: "1rem", color: "#080606ff", marginBottom: "1rem" }}>
+          Manage your internship experiences
+        </p>
+        <input
+          type="text"
+          placeholder="Search by company or role..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            padding: "0.7rem 1rem",
+            borderRadius: "12px",
+            border: "1px solid #ccc",
+            marginRight: "1rem",
+            width: "250px",
+            fontSize: "0.95rem",
+          }}
+        />
+        <button
+          onClick={() => setShowForm(true)}
+          style={{
+            padding: "1rem 2.2rem",
+            fontSize: "1rem",
+            background: "linear-gradient(90deg,#ff6a00,#ee0979)",
+            border: "none",
+            color: "#fff",
+            fontWeight: 600,
+            borderRadius: "16px",
+            cursor: "pointer",
+            marginTop: "0.5rem",
+          }}
+        >
           + Add Internship
         </button>
       </header>
 
+      {/* Centered Modal Form */}
       {showForm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Add New Internship</h3>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.35)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            padding: "1rem",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "450px",
+              background: "#fff",
+              padding: "2rem",
+              borderRadius: "18px",
+              boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
+            }}
+          >
+            <h3 style={{ marginTop: 0, marginBottom: "1rem" }}>
+              Add New Internship
+            </h3>
             <form onSubmit={handleSubmit}>
               <label>Company Name</label>
               <input
@@ -73,55 +153,106 @@ export default function Internships() {
                 name="company"
                 value={newInternship.company}
                 onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  marginBottom: "1rem",
+                  borderRadius: "10px",
+                  border: "1px solid #ccc",
+                }}
                 required
               />
-
               <label>Role / Position</label>
               <input
                 type="text"
                 name="role"
                 value={newInternship.role}
                 onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  marginBottom: "1rem",
+                  borderRadius: "10px",
+                  border: "1px solid #ccc",
+                }}
                 required
               />
-
               <label>Start Date</label>
               <input
                 type="date"
                 name="startDate"
                 value={newInternship.startDate}
                 onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  marginBottom: "1rem",
+                  borderRadius: "10px",
+                  border: "1px solid #ccc",
+                }}
                 required
               />
-
               <label>End Date</label>
               <input
                 type="date"
                 name="endDate"
                 value={newInternship.endDate}
                 onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  marginBottom: "1rem",
+                  borderRadius: "10px",
+                  border: "1px solid #ccc",
+                }}
                 required
               />
-
               <label>Description</label>
               <textarea
                 name="description"
                 value={newInternship.description}
                 onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  marginBottom: "1rem",
+                  borderRadius: "10px",
+                  border: "1px solid #ccc",
+                }}
                 required
               />
-
-              <label>Upload Certificate (optional)</label>
-              <input type="file" onChange={handleFileUpload} />
-
-              <div className="modal-buttons">
-                <button type="submit" className="primary-btn">
+              <label>Upload Certificate</label>
+              <input
+                type="file"
+                onChange={handleFileUpload}
+                style={{ marginBottom: "1rem" }}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <button
+                  type="submit"
+                  style={{
+                    background: "linear-gradient(90deg,#ff6a00,#ee0979)",
+                    border: "none",
+                    color: "#fff",
+                    padding: "0.6rem 1.5rem",
+                    fontSize: "1rem",
+                    borderRadius: "12px",
+                    cursor: "pointer",
+                  }}
+                >
                   Add
                 </button>
                 <button
                   type="button"
-                  className="ghost-btn"
                   onClick={() => setShowForm(false)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "#555",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    fontSize: "1rem",
+                  }}
                 >
                   Cancel
                 </button>
@@ -131,213 +262,78 @@ export default function Internships() {
         </div>
       )}
 
-      <section className="cards-container">
-        {internships.map((intern) => (
-          <div key={intern.id} className="intern-card">
-            <h3>{intern.role}</h3>
-            <span className="company">{intern.company}</span>
-            <span className="dates">
-              {intern.startDate} - {intern.endDate}
+      {/* Cards */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: "1.5rem",
+        }}
+      >
+        {filteredInternships.map((intern) => (
+          <div
+            key={intern.id}
+            style={{
+              padding: "1.5rem",
+              borderRadius: "20px",
+              background: "rgba(255,255,255,0.2)",
+              backdropFilter: "blur(12px)",
+              color: "#111",
+              boxShadow: "0 12px 28px rgba(0,0,0,0.1)",
+              transition: "transform 0.3s, box-shadow 0.3s",
+            }}
+          >
+            <h3 style={{ margin: "0 0 0.5rem" }}>{intern.role}</h3>
+            <span style={{ fontSize: "0.9rem", color: "#222" }}>
+              {intern.company}
             </span>
-            <p>{intern.description}</p>
-            {intern.file && <p className="file-name">📎 {intern.file.name}</p>}
+            <div
+              style={{
+                fontSize: "0.85rem",
+                color: "#333",
+                margin: "0.5rem 0",
+              }}
+            >
+              {intern.startDate} - {intern.endDate}
+            </div>
+            {openCard === intern.id && (
+              <p style={{ marginBottom: "0.5rem" }}>{intern.description}</p>
+            )}
+            {intern.file && openCard === intern.id && (
+              <a
+                href={URL.createObjectURL(intern.file)}
+                download
+                style={{
+                  display: "inline-block",
+                  marginTop: "0.5rem",
+                  textDecoration: "none",
+                  background: "#ff6a00",
+                  color: "#fff",
+                  padding: "0.3rem 0.6rem",
+                  borderRadius: "8px",
+                  fontSize: "0.85rem",
+                }}
+              >
+                📎 Download Certificate
+              </a>
+            )}
+            <button
+              onClick={() =>
+                setOpenCard(openCard === intern.id ? null : intern.id)
+              }
+              style={{
+                marginTop: "0.8rem",
+                border: "none",
+                background: "transparent",
+                color: "#ee0979",
+                cursor: "pointer",
+              }}
+            >
+              {openCard === intern.id ? "Hide Details" : "Show Details"}
+            </button>
           </div>
         ))}
-      </section>
-
-      <style>{`
-        .intern-wrapper {
-          min-height: 100vh;
-          padding: 3rem 2rem;
-          background: linear-gradient(135deg, #f5f7fa, #e0e0e0);
-          font-family: 'Inter', sans-serif;
-          color: #111;
-        }
-
-        header {
-          text-align: center;
-          margin-bottom: 2.5rem;
-        }
-
-        header h1 {
-          font-size: 2.2rem;
-          font-weight: 700;
-          background: linear-gradient(90deg,#ff6a00,#ee0979);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          margin-bottom: 0.5rem;
-        }
-
-        header p {
-          font-size: 1rem;
-          color: #555;
-          margin-bottom: 1rem;
-        }
-
-        .add-btn {
-          padding: 0.6rem 1.4rem;
-          background: linear-gradient(90deg,#ff6a00,#ee0979);
-          border: none;
-          color: #fff;
-          font-weight: 600;
-          border-radius: 14px;
-          cursor: pointer;
-          box-shadow: 0 6px 20px rgba(238,9,121,0.2);
-          transition: transform 0.15s, box-shadow 0.2s;
-        }
-
-        .add-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 28px rgba(238,9,121,0.25);
-        }
-
-        .cards-container {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 2rem;
-        }
-
-        .intern-card {
-          background: #fff;
-          border-radius: 18px;
-          padding: 2rem 1.6rem;
-          box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-          transition: transform 0.25s, box-shadow 0.25s;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .intern-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
-
-        .intern-card h3 {
-          font-size: 1.25rem;
-          margin: 0 0 0.5rem;
-          font-weight: 700;
-        }
-
-        .company {
-          font-size: 0.95rem;
-          color: #555;
-          margin-bottom: 0.25rem;
-        }
-
-        .dates {
-          font-size: 0.85rem;
-          color: #777;
-          margin-bottom: 0.8rem;
-        }
-
-        .intern-card p {
-          font-size: 0.95rem;
-          color: #444;
-          flex-grow: 1;
-          margin-bottom: 0.6rem;
-        }
-
-        .file-name {
-          font-size: 0.85rem;
-          color: #555;
-          font-style: italic;
-        }
-
-        /* Modal */
-        .modal-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.35);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 1rem;
-          z-index: 1000;
-        }
-
-        .modal-content {
-          background: #fff;
-          border-radius: 18px;
-          padding: 2.5rem 2rem;
-          width: 100%;
-          max-width: 450px;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-          animation: slideDown 0.3s ease;
-        }
-
-        .modal-content h3 {
-          margin-top: 0;
-          margin-bottom: 1.2rem;
-          font-size: 1.5rem;
-          color: #222;
-        }
-
-        .modal-content label {
-          display: block;
-          margin-bottom: 0.4rem;
-          font-weight: 600;
-          color: #111;
-        }
-
-        .modal-content input,
-        .modal-content select,
-        .modal-content textarea {
-          width: 100%;
-          padding: 0.65rem 0.9rem;
-          border-radius: 12px;
-          border: 1px solid #ccc;
-          margin-bottom: 1rem;
-          font-size: 0.95rem;
-          outline: none;
-          transition: all 0.25s ease;
-        }
-
-        .modal-content input:focus,
-        .modal-content select:focus,
-        .modal-content textarea:focus {
-          border-color: #6366f1;
-          box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
-        }
-
-        .modal-buttons {
-          display: flex;
-          justify-content: flex-end;
-          gap: 0.5rem;
-        }
-
-        .primary-btn {
-          background: linear-gradient(90deg,#ff6a00,#ee0979);
-          border: none;
-          color: #fff;
-          font-weight: 600;
-          padding: 0.65rem 1.3rem;
-          border-radius: 14px;
-          cursor: pointer;
-          transition: transform 0.15s, box-shadow 0.2s;
-        }
-
-        .primary-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 26px rgba(238,9,121,0.25);
-        }
-
-        .ghost-btn {
-          background: transparent;
-          border: none;
-          color: #555;
-          text-decoration: underline;
-          cursor: pointer;
-        }
-
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media(max-width: 600px){
-          .intern-wrapper { padding: 2rem 1rem; }
-        }
-      `}</style>
+      </div>
     </div>
   );
 }

@@ -33,19 +33,24 @@ export default function StudentProfile() {
 
       <div className="profile-card">
         <div className="profile-left">
-          <div className="pic-box">
+          {/* Clickable circle instead of choose file button */}
+          <label htmlFor="fileInput" className="pic-box">
             {profilePic ? (
               <img src={profilePic} alt="Profile" />
             ) : (
               <div className="placeholder">Upload Photo</div>
             )}
-          </div>
+          </label>
           <input
+            id="fileInput"
             type="file"
             accept="image/*"
             onChange={handlePicUpload}
-            className="upload-input"
+            style={{ display: "none" }}
           />
+
+          {/* Edit Profile Button */}
+          <button className="edit-btn">Edit Profile</button>
         </div>
 
         <div className="profile-right">
@@ -120,7 +125,7 @@ export default function StudentProfile() {
 
       <style>{`
         :root {
-          --primary: #185a9d;
+          --primary: #090b0dff;
           --secondary: #43cea2;
           --text-dark: #222;
           --text-light: #555;
@@ -134,7 +139,8 @@ export default function StudentProfile() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          background: #f5f7fa;
+          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background-size: cover;
           font-family: "Inter", system-ui, sans-serif;
           color: var(--text-dark);
         }
@@ -161,14 +167,14 @@ export default function StudentProfile() {
         .profile-card {
           background: #ffffff;
           border: 1px solid var(--border);
-          border-radius: 20px; /* slightly bigger corners */
-          padding: 3rem; /* bigger padding */
+          border-radius: 20px;
+          padding: 3rem;
           width: 100%;
-          max-width: 1100px; /* bigger max width */
-          min-height: 60vh; /* make card taller */
+          max-width: 1100px;
+          min-height: 60vh;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
           display: flex;
-          gap:2.5rem; /* more spacing */
+          gap: 2.5rem;
           animation: fadeIn 0.5s ease-in-out;
         }
 
@@ -180,8 +186,8 @@ export default function StudentProfile() {
         }
 
         .pic-box {
-          width: 180px; /* slightly bigger photo */
-          height: 180px;
+          width: 250px;
+          height: 250px;
           border-radius: 50%;
           overflow: hidden;
           border: 2px solid var(--border);
@@ -191,6 +197,11 @@ export default function StudentProfile() {
           background: #e0e0e0;
           margin-bottom: 12px;
           position: relative;
+          cursor: pointer;
+        }
+
+        .pic-box:hover {
+          opacity: 0.85;
         }
 
         .pic-box img {
@@ -204,10 +215,22 @@ export default function StudentProfile() {
           font-size: 0.95rem;
         }
 
-        .upload-input {
-          font-size: 0.9rem;
-          margin-top: 8px;
+        /* Edit Button */
+        .edit-btn {
+          margin-top: 12px;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 12px;
+          background: var(--button-gradient);
+          color: #fff;
+          font-weight: 600;
           cursor: pointer;
+          transition: transform 0.15s ease, box-shadow 0.2s ease;
+        }
+
+        .edit-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(238,9,121,0.2);
         }
 
         .profile-right {
@@ -217,7 +240,7 @@ export default function StudentProfile() {
         }
 
         .form-group {
-          margin-bottom: 2.4rem; /* more spacing between fields */
+          margin-bottom: 2.4rem;
           display: flex;
           flex-direction: column;
         }
@@ -231,7 +254,7 @@ export default function StudentProfile() {
 
         .form-group input {
           width: 100%;
-          padding: 16px; /* bigger input */
+          padding: 16px;
           border-radius: 10px;
           border: 1px solid var(--border);
           outline: none;
@@ -254,7 +277,7 @@ export default function StudentProfile() {
         .save-btn {
           margin-top: 24px;
           align-self: flex-end;
-          padding: 16px 32px; /* bigger button */
+          padding: 16px 32px;
           border: none;
           border-radius: 14px;
           background: var(--button-gradient);
