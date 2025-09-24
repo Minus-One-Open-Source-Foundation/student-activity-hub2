@@ -202,7 +202,7 @@ export default function Login() {
 
         .toggle-btn { position: absolute; right: 0.5rem; top:50%; transform: translateY(-50%); background:transparent; border:none; color:#2c3e50; font-weight:600; cursor:pointer; padding:0.15rem 0.6rem; border-radius:8px; }
 
-        .primary-btn { margin-top:0.65rem; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); border:none; padding:0.95rem; border-radius:12px; color:#fff; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 10px 20px rgba(102,130,251,0.2); transition: transform .12s; }
+        .primary-btn { margin-top:0.65rem; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); border:none; padding:0.95rem; border-radius:12px; color:#fff; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 10px 20px rgba(102,130,251,0.2); transition: transform .12s, box-shadow .18s; }
         .primary-btn:not(:disabled):hover { transform: translateY(-2px); }
         .primary-btn:disabled { opacity:0.7; cursor:not-allowed; }
 

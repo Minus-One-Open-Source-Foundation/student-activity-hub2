@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const accentGradient = "linear-gradient(90deg,#ff6a00,#ee0979)";
@@ -37,7 +37,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${open ? "sidebar-open" : ""}`}>
       <div className="sidebar-top">
         <h2 className="sidebar-title">Student Hub</h2>
         <nav className="sidebar-nav">
@@ -48,6 +48,7 @@ export default function Sidebar() {
               style={({ isActive }) =>
                 isActive ? { ...linkStyle, ...activeStyle } : linkStyle
               }
+              onClick={onClose}
             >
               {item.label}
             </NavLink>
@@ -67,21 +68,22 @@ export default function Sidebar() {
 
       <style>{`
         .sidebar {
-          width: 238px;
-          min-width: 238px;
+          position: fixed; left: 0; top: 0; height: 100vh;
+          width: 238px; min-width: 238px;
           background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
           color: #fff;
-          height: 100vh;
-          display: flex;
-          flex-direction: column;
-          padding: 22px;
-          box-sizing: border-box;
+          display: flex; flex-direction: column;
+          padding: 22px; box-sizing: border-box;
           font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+          transform: translateX(-102%);
+          transition: transform .24s ease, box-shadow .24s ease;
+          z-index: 1199;
         }
+        .sidebar-open { transform: translateX(0); box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
 
         .sidebar-top {
           flex: 1;
-          overflow-y: unset;
+          overflow-y: auto;
         }
 
         .sidebar-title {
@@ -121,7 +123,7 @@ export default function Sidebar() {
         }
 
         @media (max-width: 520px) {
-          .sidebar { width: 100vw; min-width: 100vw; padding: 1rem; }
+          .sidebar { width: 86vw; min-width: 86vw; padding: 1rem; }
           .sidebar-title { font-size: 1.15rem; }
         }
       `}</style>

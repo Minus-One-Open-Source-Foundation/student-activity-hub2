@@ -21,6 +21,7 @@ import Internships from "./pages/Internships";
 function App() {
   const { user } = useAuth();
 
+  // 🎨 Enhanced MUI Theme
   // 🎨 MUI Theme
   const theme = createTheme({
     palette: {

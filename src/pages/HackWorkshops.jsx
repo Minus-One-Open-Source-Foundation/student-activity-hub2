@@ -141,9 +141,9 @@ export default function HackWorkshops() {
         header h1 {
           font-size: 2.2rem;
           font-weight: 700;
-          color: #111; /* change from gradient to black */
+          color: #000;
           margin-bottom: 0.5rem;
-          }
+        }
 
         header p { font-size: 1rem; color: #555; margin-bottom: 1rem; }
 
