@@ -1,4 +1,5 @@
 import React from "react";
+import Heading from "../components/Heading";
 
 export default function AcademicRecords() {
   const semesters = [
@@ -28,7 +29,7 @@ export default function AcademicRecords() {
   return (
     <div className="records-wrapper">
       <header>
-        <h1>Academic Records</h1>
+        <Heading text="Academic Records" alignment="center" />
         <p>Click on a semester to view or download the marksheet</p>
       </header>
 

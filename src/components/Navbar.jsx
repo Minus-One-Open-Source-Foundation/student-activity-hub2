@@ -29,7 +29,6 @@ export default function Navbar({ onToggleSidebar }) {
         <Typography
           variant="h6"
           sx={{
-            flexGrow: 1,
             fontWeight: "bold",
             letterSpacing: "0.5px",
             color: "#ffd700",
@@ -37,49 +36,61 @@ export default function Navbar({ onToggleSidebar }) {
         >
           Student Activity Hub
         </Typography>
-        {user ? (
-          <>
-            <Typography
-              variant="body1"
-              sx={{ mr: 3, fontWeight: 600, color: "#000" }}
-            >
-              Welcome, {user.email}
-            </Typography>
-            <Button
-              onClick={logout}
-              sx={{
-                background: "linear-gradient(90deg,#ff6a00,#ee0979)",
-                color: "#fff",
-                borderRadius: "12px",
-                px: 2.5,
-                py: 1.2,
-                fontWeight: 700,
-                fontSize: "1rem",
-                boxShadow: "0 8px 26px rgba(238,9,121,0.13)",
-                textTransform: "none",
-                "&:hover": {
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 10px 30px rgba(238,9,121,0.18)",
+        <div
+          style={{
+            marginLeft: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
+          }}
+        >
+          {user ? (
+            <>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: 600,
+                  color: "#000",
+                }}
+              >
+                Welcome, {user.email}
+              </Typography>
+              <Button
+                onClick={logout}
+                sx={{
                   background: "linear-gradient(90deg,#ff6a00,#ee0979)",
-                },
+                  color: "#fff",
+                  borderRadius: "12px",
+                  px: 2.5,
+                  py: 1.2,
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                  boxShadow: "0 8px 26px rgba(238,9,121,0.13)",
+                  textTransform: "none",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 10px 30px rgba(238,9,121,0.18)",
+                    background: "linear-gradient(90deg,#ff6a00,#ee0979)",
+                  },
+                }}
+              >
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button
+              color="inherit"
+              sx={{
+                border: "1px solid white",
+                borderRadius: "10px",
+                px: 2,
+                "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
               }}
             >
-              Logout
+              Login
             </Button>
-          </>
-        ) : (
-          <Button
-            color="inherit"
-            sx={{
-              border: "1px solid white",
-              borderRadius: "10px",
-              px: 2,
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
-            }}
-          >
-            Login
-          </Button>
-        )}
+          )}
+        </div>
       </Toolbar>
     </AppBar>
   );
