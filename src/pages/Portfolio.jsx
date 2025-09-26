@@ -60,12 +60,9 @@ export default function Portfolio() {
         header h1 {
           font-size: 2rem;
           font-weight: 700;
-  color: #000; /* changed to black */
-  background: none;
-  -webkit-background-clip: initial;
-  -webkit-text-fill-color: initial;
-  margin-bottom: 0.5rem;
-}
+          color: #000;
+          margin-bottom: 0.5rem;
+        }
 
 
         header p {

@@ -68,7 +68,7 @@ export default function AcademicRecords() {
         header h1 {
           font-size: 2.5rem;
           font-weight: 700;
-          color: #1e293b;
+          color: #000;
           margin-bottom: 0.5rem;
         }
 

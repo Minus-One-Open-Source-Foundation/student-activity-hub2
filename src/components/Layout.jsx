@@ -1,10 +1,24 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
+import Navbar from "./Navbar";
 
 export default function Layout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = useCallback(() => setSidebarOpen((s) => !s), []);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") setSidebarOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div className="layout-wrapper">
-      <Sidebar /> {/* always visible on the left */}
+      <Navbar onToggleSidebar={toggleSidebar} />
+      {sidebarOpen && <div className="overlay" onClick={closeSidebar} />}
+      <Sidebar open={sidebarOpen} onClose={closeSidebar} />
       <main className="content">{children}</main>
 
       <style>{`
@@ -18,11 +32,17 @@ export default function Layout({ children }) {
           font-family: 'Inter', sans-serif;
         }
 
+        .overlay {
+          position: fixed; inset: 0; z-index: 1198;
+          background: rgba(0,0,0,0.35);
+        }
+
         /* Main content area */
 
         .content {
           flex: 1;
-          padding: 0;
+          padding: 16px;
+          padding-top: calc(64px + 12px);
           overflow-y: auto;
           min-height: 100vh;
           box-sizing: border-box;
@@ -33,26 +53,11 @@ export default function Layout({ children }) {
         }
 
         /* Optional: smooth scroll for content */
-        .content::-webkit-scrollbar {
-          width: 8px;
-        }
-        .content::-webkit-scrollbar-thumb {
-          background-color: rgba(0,0,0,0.2);
-          border-radius: 4px;
-        }
-        .content::-webkit-scrollbar-track {
-          background: transparent;
-        }
+        .content::-webkit-scrollbar { width: 8px; }
+        .content::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 4px; }
+        .content::-webkit-scrollbar-track { background: transparent; }
 
-        /* Responsive: sidebar on top for small screens */
-        @media(max-width:768px){
-          .layout-wrapper {
-            flex-direction: column;
-          }
-          .content {
-            padding: 0;
-          }
-        }
+        @media(max-width:768px){ .layout-wrapper { flex-direction: column; } .content { padding: 12px; padding-top: calc(56px + 10px); } }
       `}</style>
     </div>
   );
