@@ -61,6 +61,7 @@ export default function StudentProfile() {
               name="name"
               value={info.name}
               onChange={handleChange}
+              className="gradient-input"
             />
           </div>
 
@@ -72,6 +73,7 @@ export default function StudentProfile() {
                 name="dob"
                 value={info.dob}
                 onChange={handleChange}
+                className="gradient-input"
               />
             </div>
             <div className="form-group">
@@ -81,6 +83,7 @@ export default function StudentProfile() {
                 name="regno"
                 value={info.regno}
                 onChange={handleChange}
+                className="gradient-input"
               />
             </div>
           </div>
@@ -93,6 +96,7 @@ export default function StudentProfile() {
                 name="phone"
                 value={info.phone}
                 onChange={handleChange}
+                className="gradient-input"
               />
             </div>
             <div className="form-group">
@@ -103,6 +107,7 @@ export default function StudentProfile() {
                 name="email"
                 value={info.email}
                 onChange={handleChange}
+                className="gradient-input"
               />
             </div>
           </div>
@@ -114,6 +119,7 @@ export default function StudentProfile() {
               name="department"
               value={info.department}
               onChange={handleChange}
+              className="gradient-input"
             />
           </div>
 
@@ -261,6 +267,7 @@ export default function StudentProfile() {
           font-size: 16px;
           background: #fafafa;
           transition: all 0.25s ease;
+          text-align: left; /* Ensures text alignment */
         }
 
         .form-group input:focus {
@@ -310,6 +317,54 @@ export default function StudentProfile() {
             width: 100%;
             align-self: center;
           }
+        }
+
+        .personal-info-wrapper {
+          min-height: 100vh;
+          padding: 2rem;
+          font-family: 'Inter', sans-serif;
+          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background-size: cover;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .personal-info-form {
+          background: #fff;
+          border-radius: 18px;
+          box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+          padding: 2rem;
+          width: 100%;
+          max-width: 600px;
+        }
+        .form-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+        .form-group {
+          flex: 1;
+        }
+        .form-group label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+          color: #333;
+        }
+        .gradient-input {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border-radius: 12px;
+          border: 1px solid #c5b3f7; /* Enhanced border contrast */
+          background-color: #e5d1ff !important; /* Increased background contrast */
+          color: #333;
+          font-size: 1rem;
+          outline: none;
+        }
+        .gradient-input::placeholder {
+          color: #666;
+          opacity: 0.8;
         }
       `}</style>
     </div>
