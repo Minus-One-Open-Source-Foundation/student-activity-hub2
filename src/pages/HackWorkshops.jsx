@@ -144,11 +144,22 @@ export default function HackWorkshops() {
                 <span className="date">{event.date}</span>
                 <p>{event.description}</p>
               </div>
-              <div className="file-preview">
+              <div className="file-preview" style={{ position: "relative" }}>
                 {event.file ? (
                   <>
-                    <FaFileAlt className="file-logo" /> {/* File logo */}
-                    <span className="file-type">{event.file.type}</span>
+                    <FaFileAlt className="file-logo" style={{ display: "block", margin: "0 auto" }} /> {/* File logo */}
+                    <span className="file-type" style={{ textAlign: "center", display: "block" }}>{event.file.type}</span>
+                    <div className="status-box inside" style={{ marginTop: "0.5rem", textAlign: "center" }}> {/* Positioned under file logo */}
+                      {event.status === "Approved" ? (
+                        <span className="approved">
+                          <FaCheckCircle /> Approved
+                        </span>
+                      ) : (
+                        <span className="pending">
+                          <FaExclamationCircle /> Pending
+                        </span>
+                      )}
+                    </div>
                   </>
                 ) : (
                   <div className="file-placeholder">
@@ -156,17 +167,6 @@ export default function HackWorkshops() {
                   </div>
                 )}
               </div>
-            </div>
-            <div className="status-box below"> {/* Moved below and outside JPG box */}
-              {event.status === "Approved" ? (
-                <span className="approved">
-                  <FaCheckCircle /> Approved
-                </span>
-              ) : (
-                <span className="pending">
-                  <FaExclamationCircle /> Pending
-                </span>
-              )}
             </div>
           </div>
         ))}
