@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import { useAuth } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
+import FacultyLayout from "./components/FacultyLayout";
 
 // Auth Pages
 import Login from "./pages/Login";
@@ -17,6 +18,12 @@ import Portfolio from "./pages/Portfolio";
 import Analytics from "./pages/Analytics";
 import HackWorkshops from "./pages/HackWorkshops";
 import Internships from "./pages/Internships";
+
+// Faculty Pages
+import FacultyDashboard from "./pages/FacultyDashboard";
+import StudentManagement from "./pages/StudentManagement";
+import GradeManagement from "./pages/GradeManagement";
+import Reports from "./pages/Reports";
 
 function App() {
   const { user } = useAuth();
@@ -47,7 +54,26 @@ function App() {
     );
   }
 
-  // ✅ Logged in → student pages
+  // ✅ Logged in → route based on user role
+  if (user.role === "faculty") {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <FacultyLayout>
+          <Routes>
+            <Route path="/faculty" element={<FacultyDashboard />} />
+            <Route path="/faculty/students" element={<StudentManagement />} />
+            <Route path="/faculty/grades" element={<GradeManagement />} />
+            <Route path="/faculty/reports" element={<Reports />} />
+            <Route path="/faculty/analytics" element={<div>Faculty Analytics</div>} />
+            <Route path="*" element={<Navigate to="/faculty" replace />} />
+          </Routes>
+        </FacultyLayout>
+      </ThemeProvider>
+    );
+  }
+
+  // ✅ Student pages
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

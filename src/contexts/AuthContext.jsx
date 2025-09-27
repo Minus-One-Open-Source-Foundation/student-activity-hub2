@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from "react";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  // 🔑 Default hardcoded student
+  // 🔑 Default hardcoded users
   const defaultStudent = {
     email: "student@test.com",
     password: "12345678",
@@ -11,8 +11,15 @@ export function AuthProvider({ children }) {
     name: "Student Name",
   };
 
+  const defaultFaculty = {
+    email: "faculty@test.com",
+    password: "faculty123",
+    role: "faculty",
+    name: "Faculty Name",
+  };
+
   const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([defaultStudent]);
+  const [users, setUsers] = useState([defaultStudent, defaultFaculty]);
 
   // 🔐 Login
   const login = (email, password) => {

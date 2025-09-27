@@ -34,7 +34,7 @@ export default function Navbar({ onToggleSidebar }) {
             color: "#ffd700",
           }}
         >
-          Student Activity Hub
+          {user?.role === "faculty" ? "Faculty Hub" : "Student Activity Hub"}
         </Typography>
         <div
           style={{
