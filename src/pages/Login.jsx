@@ -26,7 +26,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) {
       setFeedback({ text: "Please fix the errors above", type: "error" });
@@ -34,27 +34,26 @@ export default function Login() {
     }
 
     setLoading(true);
-    // handle both sync and async login functions
-    Promise.resolve(login(form.email, form.password))
-      .then((success) => {
-        setLoading(false);
-        if (success) {
-          setFeedback({ text: "Login successful — redirecting...", type: "success" });
-          setTimeout(() => navigate("/"), 900);
-        } else {
-          setFeedback({ text: "Invalid email or password", type: "error" });
-        }
-      })
-      .catch((err) => {
-        setLoading(false);
-        setFeedback({ text: err?.message || "Login failed", type: "error" });
+    setFeedback(null);
+
+    try {
+      await login(form.email, form.password);
+      setFeedback({ text: "Login successful — redirecting...", type: "success" });
+      setTimeout(() => navigate("/"), 900);
+    } catch (error) {
+      setFeedback({ 
+        text: error.response?.data?.message || error.message || "Login failed. Please check your credentials.", 
+        type: "error" 
       });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-wrapper">
-      <form className="auth-card" onSubmit={handleSubmit} autoComplete="off" noValidate>
-        <h1 className="title">Welcome Back</h1>
+      <form className="auth-card animate-card" onSubmit={handleSubmit} autoComplete="off" noValidate>
+        <h1 className="title animate-fade-in">Welcome Back</h1>
         <p className="subtitle">Sign in to access your student dashboard</p>
 
         <label className="label">Email</label>
@@ -64,7 +63,7 @@ export default function Login() {
           value={form.email}
           onChange={handleChange}
           placeholder="you@example.com"
-          className={errors.email ? "input input-error" : "input"}
+          className={errors.email ? "input input-error shake" : "input"}
           disabled={loading}
         />
         {errors.email && <div className="field-error">{errors.email}</div>}
@@ -77,7 +76,7 @@ export default function Login() {
             value={form.password}
             onChange={handleChange}
             placeholder="At least 8 characters"
-            className={errors.password ? "input input-error" : "input"}
+            className={errors.password ? "input input-error shake" : "input"}
             disabled={loading}
           />
           <button
@@ -91,7 +90,7 @@ export default function Login() {
         </div>
         {errors.password && <div className="field-error">{errors.password}</div>}
 
-        <button type="submit" className="primary-btn" disabled={loading}>
+        <button type="submit" className="primary-btn ripple" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
 
@@ -105,7 +104,7 @@ export default function Login() {
         </button>
 
         {feedback && (
-          <div className={`feedback ${feedback.type === "success" ? "fb-success" : "fb-error"}`}>
+          <div className={`feedback ${feedback.type === "success" ? "fb-success pop-in" : "fb-error shake"}`}>
             {feedback.text}
           </div>
         )}
@@ -113,65 +112,114 @@ export default function Login() {
 
       <style>{`
         :root {
-          --card-bg: rgba(255,255,255,0.12);
-          --input-bg: rgba(255,255,255,0.14);
-          --glass-border: rgba(255,255,255,0.18);
-          --accent-1: #ff6a00;
-          --accent-2: #ee0979;
+          --card-bg: rgba(255,255,255,0.85);
+          --input-bg: rgba(240, 244, 248, 0.95);
+          --glass-border: rgba(200, 217, 223,0.7);
+          --accent-1: #6a82fb;
+          --accent-2: #fc5c7d;
         }
-        *{box-sizing:border-box}
-        .auth-wrapper{
-          min-height:100vh;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          padding:2rem;
-          background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+
+        * { box-sizing: border-box }
+
+        .auth-wrapper {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
           font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+
+          /* Background image + gradient overlay */
+          background-image: 
+            linear-gradient(270deg, rgba(142,197,252,0.75), rgba(224,195,252,0.75), rgba(240,244,248,0.75), rgba(207,217,223,0.75)),
+            url("/src/assets/bg.jpg"); /* 👉 replace with your image path */
+          background-size: 800% 800%, cover;
+          background-position: center;
+          background-attachment: fixed;
+          animation: gradientMove 25s ease infinite;
         }
-        .auth-card{
-          width:100%;
-          max-width:420px;
-          background:var(--card-bg);
+
+        @keyframes gradientMove {
+          0% { background-position: 0% 50%, center; }
+          25% { background-position: 50% 50%, center; }
+          50% { background-position: 100% 50%, center; }
+          75% { background-position: 50% 50%, center; }
+          100% { background-position: 0% 50%, center; }
+        }
+
+        .auth-card {
+          width: 100%;
+          max-width: 420px;
+          background: var(--card-bg);
           backdrop-filter: blur(12px) saturate(120%);
-          border-radius:18px;
-          padding:2.4rem;
-          box-shadow: 0 18px 50px rgba(0,0,0,0.25);
-          display:flex;
-          flex-direction:column;
-          gap:0.9rem;
-          color: #fff;
+          border-radius: 18px;
+          padding: 2.4rem;
+          box-shadow: 0 18px 50px rgba(0,0,0,0.1);
+          display: flex;
+          flex-direction: column;
+          gap: 0.9rem;
+          color: #2c3e50;
+          animation: fadeIn 0.8s ease-out;
         }
-        .title{
-          margin:0;
-          text-align:center;
-          font-size:1.9rem;
-          line-height:1.05;
-          font-weight:700;
-          background: linear-gradient(90deg,#fff,#ffd700);
-          -webkit-background-clip:text;
-          -webkit-text-fill-color:transparent;
+
+        .title {
+          margin: 0;
+          text-align: center;
+          font-size: 1.9rem;
+          font-weight: 700;
+          color: #2c3e50;
         }
-        .subtitle{ margin:0; text-align:center; color:rgba(255,255,255,0.85); font-size:0.98rem; margin-bottom:0.6rem; }
-        .label{ font-size:0.95rem; margin-top:0.6rem; margin-bottom:0.35rem; color:rgba(255,255,255,0.92); font-weight:600; }
-        .input{ width:100%; padding:0.9rem 1rem; border-radius:12px; border:1px solid var(--glass-border); background:var(--input-bg); color:#fff; font-size:1rem; outline:none; transition:box-shadow .18s, transform .12s; }
-        .input::placeholder{ color: rgba(255,255,255,0.72); }
-        .input:focus{ box-shadow:0 6px 18px rgba(0,0,0,0.25); transform:translateY(-1px); border-color: rgba(255,255,255,0.95); }
-        .input-error{ box-shadow: none; border-color: #ff6b6b !important; }
-        .field-error{ color:#ffb4b4; font-size:0.86rem; margin-top:0.35rem; }
-        .password-row{ position:relative; display:flex; align-items:center; gap:0.6rem; }
-        .toggle-btn{ position:absolute; right:0.5rem; top:50%; transform:translateY(-50%); background:transparent; border:none; color:#fff; font-weight:600; cursor:pointer; padding:0.15rem 0.6rem; border-radius:8px; }
-        .primary-btn{ margin-top:0.65rem; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); border:none; padding:0.95rem; border-radius:12px; color:#fff; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 10px 30px rgba(238,9,121,0.14); transition: transform .12s; }
-        .primary-btn:disabled{ opacity:0.7; cursor:not-allowed; transform:none; }
-        .primary-btn:not(:disabled):hover{ transform:translateY(-3px); }
-        .ghost-btn{ margin-top:0.25rem; background:transparent; color:#fff; border:none; text-decoration:underline; font-weight:600; cursor:pointer; }
-        .feedback{ margin-top:0.6rem; padding:0.6rem; border-radius:10px; text-align:center; font-weight:700; }
-        .fb-success{ background:#d8ffe8; color:#006b29; }
-        .fb-error{ background:#fff2f3; color:#b00020; }
-        @media (max-width:520px){
-          .auth-card{ padding:1.6rem; border-radius:14px; }
-          .title{ font-size:1.6rem; }
+
+        .subtitle {
+          margin: 0;
+          text-align: center;
+          color: #4f5d75;
+          font-size: 0.98rem;
+          margin-bottom: 0.6rem;
         }
+
+        .label { font-size: 0.95rem; margin-top:0.6rem; margin-bottom:0.35rem; font-weight:600; color:#2c3e50; }
+
+        .input {
+          width: 100%;
+          padding: 0.9rem 1rem;
+          border-radius: 12px;
+          border: 1px solid var(--glass-border);
+          background: var(--input-bg);
+          color: #2c3e50;
+          font-size: 1rem;
+          outline: none;
+          transition: box-shadow .18s, transform .12s;
+        }
+
+        .input::placeholder { color: #7d8ca3; }
+        .input:focus { box-shadow: 0 6px 18px rgba(0,0,0,0.1); transform: translateY(-1px); border-color: #a1b5d8; }
+        .input-error { border-color: #fc5c7d; }
+
+        .field-error { color: #b00020; font-size: 0.86rem; margin-top: 0.35rem; }
+
+        .password-row { position: relative; display: flex; align-items: center; gap:0.6rem; }
+
+        .toggle-btn { position: absolute; right: 0.5rem; top:50%; transform: translateY(-50%); background:transparent; border:none; color:#2c3e50; font-weight:600; cursor:pointer; padding:0.15rem 0.6rem; border-radius:8px; }
+
+        .primary-btn { margin-top:0.65rem; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); border:none; padding:0.95rem; border-radius:12px; color:#fff; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 10px 20px rgba(102,130,251,0.2); transition: transform .12s, box-shadow .18s; }
+        .primary-btn:not(:disabled):hover { transform: translateY(-2px); }
+        .primary-btn:disabled { opacity:0.7; cursor:not-allowed; }
+
+        .ghost-btn { margin-top:0.25rem; background:transparent; color:#2c3e50; border:none; text-decoration:underline; font-weight:600; cursor:pointer; }
+
+        .feedback { margin-top:0.6rem; padding:0.6rem; border-radius:10px; text-align:center; font-weight:700; }
+        .fb-success { background:#d8ffe8; color:#006b29; }
+        .fb-error { background:#fff2f3; color:#b00020; }
+
+        @keyframes fadeIn { from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);} }
+        @keyframes shake { 10%,90%{transform:translateX(-2px);}20%,80%{transform:translateX(4px);}30%,50%,70%{transform:translateX(-6px);}40%,60%{transform:translateX(6px);} }
+        @keyframes popIn { from{transform:scale(0.9); opacity:0;} to{transform:scale(1); opacity:1;} }
+
+        .shake { animation: shake 0.4s ease-in-out; }
+        .pop-in { animation: popIn 0.4s ease-out; }
+
+        @media (max-width:520px) { .auth-card { padding:1.6rem; border-radius:14px; } .title{font-size:1.6rem;} }
       `}</style>
     </div>
   );

@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-export default function Sidebar({ open = false, onClose }) {
+export default function FacultySidebar({ open = false, onClose }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const accentGradient = "linear-gradient(90deg,#ff6a00,#ee0979)";
@@ -25,21 +25,16 @@ export default function Sidebar({ open = false, onClose }) {
   };
 
   const navItems = [
-    { to: "/", label: "Dashboard" },
-    { to: "/personal-info", label: "Personal Info" },
-    { to: "/academic-records", label: "Academic Records" },
-    { to: "/hackathons-workshops", label: "Hackathons & Workshops" }, // Added
-    { to: "/internships", label: "Internships" }, // Added
-    { to: "/activities", label: "Activities" },
-    { to: "/achievements", label: "Achievements" },
-    { to: "/portfolio", label: "Portfolio" },
-    { to: "/analytics", label: "Analytics" },
+    { to: "/faculty", label: "Dashboard" },
+    { to: "/faculty/students", label: "Student Management" },
+    { to: "/faculty/grades", label: "Grade Management" },
+    { to: "/faculty/reports", label: "Reports" },
   ];
 
   return (
     <div className={`sidebar ${open ? "sidebar-open" : ""}`}>
       <div className="sidebar-top">
-        <h2 className="sidebar-title">Student Hub</h2>
+        <h2 className="sidebar-title">Faculty Hub</h2>
         <nav className="sidebar-nav">
           {navItems.map((item, i) => (
             <NavLink
@@ -68,12 +63,18 @@ export default function Sidebar({ open = false, onClose }) {
 
       <style>{`
         .sidebar {
-          position: fixed; left: 0; top: 0; height: 100vh;
-          width: 238px; min-width: 238px;
+          position: fixed;
+          left: 0;
+          top: 0;
+          height: 100vh;
+          width: 238px;
+          min-width: 238px;
           background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
           color: #fff;
-          display: flex; flex-direction: column;
-          padding: 22px; box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          padding: 22px;
+          box-sizing: border-box;
           font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
           transform: translateX(-102%);
           transition: transform .24s ease, box-shadow .24s ease;
@@ -81,10 +82,7 @@ export default function Sidebar({ open = false, onClose }) {
         }
         .sidebar-open { transform: translateX(0); box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
 
-        .sidebar-top {
-          flex: 1;
-          overflow-y: auto;
-        }
+        .sidebar-top { flex: 1; overflow-y: auto; }
 
         .sidebar-title {
           margin-bottom: 26px;
@@ -97,11 +95,7 @@ export default function Sidebar({ open = false, onClose }) {
           -webkit-text-fill-color: transparent;
         }
 
-        .sidebar-nav {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
 
         .logout-btn {
           margin-top: 20px;

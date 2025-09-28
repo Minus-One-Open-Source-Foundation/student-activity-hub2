@@ -1,43 +1,73 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { authAPI } from "../services/api";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  // default test user
-  // const defaultUser = { email: "student@test.com", password: "12345678" };
-  // const defaultFaculty = { email: "faculty@test.com", password: "  // ...existing code...
-  const defaultUser = { email: "student@test.com", password: "12345678", role: "student", name: "John Doe" };
-  const defaultFaculty = { email: "faculty@test.com", password: "faculty123", role: "faculty", name: "Faculty Name" };
-  // ...existing code...", role: "faculty" };
-
   const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([defaultUser,defaultFaculty]); // store multiple users in memory
- 
+  const [loading, setLoading] = useState(true);
 
-  const login = (email, password) => {
-    const existingUser = users.find(
-      (u) => u.email === email && u.password === password
-    );
-    if (existingUser) {
-      setUser(existingUser);
-      return true;
+  // Check for existing token on mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('userData');
+    
+    if (token && userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
+      }
     }
-    return false;
+    setLoading(false);
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      const response = await authAPI.login(email, password);
+      
+      if (response.success) {
+        // Store token and user data
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('userData', JSON.stringify(response.user || { email }));
+        setUser(response.user || { email });
+        return true;
+      } else {
+        throw new Error(response.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
-  const register = (name, email, password) => {
-    const exists = users.some((u) => u.email === email);
-    if (exists) return false;
-
-    const newUser = { name, email, password };
-    setUsers([...users, newUser]);
-    return true;
+  const register = async (name, email, password) => {
+    try {
+      const response = await authAPI.register(name, email, password);
+      console.log('Registration response:', response); // Debug log
+      
+      // If we get here without an exception, it means the HTTP request was successful (200/201)
+      // Your Spring Boot controller returns ResponseEntity.ok() for success
+      // So if no exception was thrown, registration was successful
+      return true;
+      
+    } catch (error) {
+      console.error('Registration error:', error);
+      // Only throw error if there was actually an HTTP error (400, 500, etc.)
+      throw error;
+    }
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userData');
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register }}>
+    <AuthContext.Provider value={{ user, login, logout, register, loading }}>
       {children}
     </AuthContext.Provider>
   );

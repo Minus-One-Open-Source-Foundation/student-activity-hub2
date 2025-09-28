@@ -17,66 +17,117 @@ export default function Portfolio() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "40px",
-        background: "linear-gradient(135deg, #ff9a9e, #fad0c4)",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>📂 Digital Portfolio</h2>
+    <div className="portfolio-wrapper">
+      <header>
+        <h1>Digital Portfolio</h1>
+        <p>Upload and manage your documents</p>
+      </header>
 
-      <label
-        style={{
-          display: "inline-block",
-          padding: "10px 20px",
-          background: "#6a11cb",
-          color: "#fff",
-          borderRadius: "8px",
-          cursor: "pointer",
-          marginBottom: "20px",
-        }}
-      >
+      <label className="upload-btn">
         Upload Documents
         <input type="file" hidden multiple onChange={handleUpload} />
       </label>
 
-      <div>
+      <section className="files-container">
         {files.length === 0 ? (
-          <p style={{ color: "#444" }}>No documents uploaded yet.</p>
+          <div className="empty">No documents uploaded yet.</div>
         ) : (
           files.map((file, i) => (
-            <div
-              key={i}
-              style={{
-                background: "rgba(255,255,255,0.8)",
-                padding: "10px",
-                marginBottom: "10px",
-                borderRadius: "8px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+            <div key={i} className="file-card">
               <span>{file.name}</span>
-              <button
-                onClick={() => handleDelete(file.name)}
-                style={{
-                  background: "red",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                }}
-              >
+              <button onClick={() => handleDelete(file.name)}>
                 <FaTrash />
               </button>
             </div>
           ))
         )}
-      </div>
+      </section>
+
+      <style>{`
+        .portfolio-wrapper {
+          min-height: 100vh;
+          padding: 3rem 2rem;
+          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background-size: cover;
+          font-family: 'Inter', sans-serif;
+          color: #333;
+        }
+
+        header {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+        header h1 {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #000;
+          margin-bottom: 0.5rem;
+        }
+
+
+        header p {
+          font-size: 1rem;
+          color: #555;
+        }
+
+        .upload-btn {
+          display: inline-block;
+          padding: 0.8rem 1.5rem;
+          background: linear-gradient(90deg,#6a11cb,#2575fc);
+          color: #fff;
+          font-weight: 600;
+          border-radius: 12px;
+          cursor: pointer;
+          margin-bottom: 2rem;
+          transition: transform 0.15s, box-shadow 0.2s;
+        }
+
+        .upload-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .files-container {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 1.5rem;
+        }
+
+        .file-card {
+          background: #f9f9f9;
+          border-radius: 16px;
+          padding: 1rem 1.5rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-weight: 600;
+          transition: transform 0.25s, box-shadow 0.25s;
+        }
+
+        .file-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+        }
+
+        .file-card button {
+          background: none;
+          border: none;
+          color: #ff4b5c;
+          cursor: pointer;
+          font-size: 1.1rem;
+        }
+
+        .empty {
+          text-align: center;
+          font-size: 1rem;
+          color: #999;
+          grid-column: 1/-1;
+        }
+
+        @media(max-width:600px){
+          .upload-btn { width: 100%; text-align: center; }
+        }
+      `}</style>
     </div>
   );
 }
