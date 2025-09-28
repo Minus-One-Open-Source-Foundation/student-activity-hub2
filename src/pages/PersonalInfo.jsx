@@ -45,23 +45,56 @@ export default function StudentProfile() {
           
           console.log('Raw profile data from backend:', JSON.stringify(profileData, null, 2));
           
+          // Helper function to convert Indian date format (dd-MM-yyyy) to HTML date input format (yyyy-MM-dd)
+          const convertIndianDateToISO = (indianDate) => {
+            if (!indianDate) return "";
+            
+            console.log('Converting Indian date format:', indianDate);
+            
+            // Check if it's already in ISO format (yyyy-MM-dd)
+            if (indianDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              console.log('Date already in ISO format:', indianDate);
+              return indianDate;
+            }
+            
+            // Convert from dd-MM-yyyy to yyyy-MM-dd
+            if (indianDate.match(/^\d{2}-\d{2}-\d{4}$/)) {
+              const [day, month, year] = indianDate.split('-');
+              const isoDate = `${year}-${month}-${day}`;
+              console.log('Converted Indian date', indianDate, 'to ISO:', isoDate);
+              return isoDate;
+            }
+            
+            console.warn('Unrecognized date format:', indianDate);
+            return "";
+          };
+
           // Map backend data to frontend structure (matching your UserService DTO structure)
           setInfo({
             name: profileData.name || profileData.username || "",
-            dob: profileData.dateOfBirth || "", // Note: Your backend doesn't have dateOfBirth field
-            phone: profileData.phone ? String(profileData.phone) : "", // Backend phone field is Long, convert to string for display
+            dob: convertIndianDateToISO(profileData.dateOfBirth), 
+            phone: profileData.phoneNumber || profileData.phone ? String(profileData.phoneNumber || profileData.phone) : "", // Backend returns phoneNumber
             email: profileData.email || user.email || "",
             department: profileData.department || "",
             regno: profileData.registerNumber || "",
           });
           
+          // Set profile image if available from backend
+          if (profileData.profileImageUrl) {
+            console.log('Setting profile image from backend:', profileData.profileImageUrl);
+            setProfilePic(profileData.profileImageUrl);
+          }
+          
           console.log('Mapped profile info:', {
             name: profileData.name || profileData.username || "",
-            phone: profileData.phone ? String(profileData.phone) : "",
+            dob: profileData.dateOfBirth || "",
+            phone: profileData.phoneNumber || profileData.phone,
             email: profileData.email,
             department: profileData.department,
-            registerNumber: profileData.registerNumber
+            registerNumber: profileData.registerNumber,
+            profileImageUrl: profileData.profileImageUrl
           });
+          console.log('🎂 Date of Birth loaded from backend:', profileData.dateOfBirth);
         } catch (error) {
           console.error('Failed to load profile:', error);
           
@@ -94,12 +127,113 @@ export default function StudentProfile() {
   }, [user]);
 
   const handleChange = (e) => {
-    setInfo({ ...info, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Real-time phone number validation - prevent spaces
+    if (name === 'phone') {
+      // Remove spaces as user types
+      const cleanValue = value.replace(/\s+/g, '');
+      if (cleanValue !== value) {
+        // Show warning if spaces were removed
+        console.log('Removed spaces from phone number');
+      }
+      setInfo({ ...info, [name]: cleanValue });
+    } else {
+      setInfo({ ...info, [name]: value });
+    }
+  };
+
+  // Get field validation status
+  const getFieldValidationClass = (fieldName) => {
+    if (!isEditing) return '';
+    
+    const errors = validateForm();
+    const hasError = errors.some(error => 
+      error.toLowerCase().includes(fieldName.toLowerCase())
+    );
+    
+    return hasError ? 'invalid' : '';
+  };
+
+  const validateForm = () => {
+    const errors = [];
+
+    // Name validation
+    if (!info.name || info.name.trim().length === 0) {
+      errors.push('Name is required');
+    } else if (info.name.trim().length < 2) {
+      errors.push('Name must be at least 2 characters long');
+    } else if (!/^[a-zA-Z\s]+$/.test(info.name.trim())) {
+      errors.push('Name can only contain letters and spaces');
+    }
+
+    // Email validation
+    if (!info.email || info.email.trim().length === 0) {
+      errors.push('Email is required');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(info.email.trim())) {
+      errors.push('Please enter a valid email address');
+    }
+
+    // Phone number validation
+    if (!info.phone || info.phone.trim().length === 0) {
+      errors.push('Phone number is required');
+    } else {
+      const cleanPhone = info.phone.replace(/\s+/g, ''); // Remove all spaces
+      if (cleanPhone !== info.phone) {
+        errors.push('Phone number should not contain spaces');
+      } else if (!/^\d{10}$/.test(cleanPhone)) {
+        errors.push('Phone number must be exactly 10 digits');
+      } else if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+        errors.push('Phone number must start with 6, 7, 8, or 9');
+      }
+    }
+
+    // Department validation
+    if (!info.department || info.department.trim().length === 0) {
+      errors.push('Department is required');
+    } else if (info.department.trim().length < 2) {
+      errors.push('Department name must be at least 2 characters long');
+    }
+
+    // Register number validation
+    if (!info.regno || info.regno.trim().length === 0) {
+      errors.push('Register number is required');
+    } else if (info.regno.trim().length < 3) {
+      errors.push('Register number must be at least 3 characters long');
+    } else if (!/^[a-zA-Z0-9]+$/.test(info.regno.trim())) {
+      errors.push('Register number can only contain letters and numbers (no spaces or special characters)');
+    }
+
+    // Date of birth validation
+    if (!info.dob) {
+      errors.push('Date of birth is required');
+    } else {
+      const dobDate = new Date(info.dob);
+      const today = new Date();
+      const age = today.getFullYear() - dobDate.getFullYear();
+      
+      if (dobDate > today) {
+        errors.push('Date of birth cannot be in the future');
+      } else if (age < 16) {
+        errors.push('You must be at least 16 years old');
+      } else if (age > 100) {
+        errors.push('Please enter a valid date of birth');
+      }
+    }
+
+    return errors;
   };
 
   const handleSave = async () => {
     if (!user?.email) {
       alert('Please log in to save profile');
+      return;
+    }
+
+    // Validate form before saving
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
+      alert('Please fix the following errors:\n\n' + validationErrors.join('\n'));
       return;
     }
 
@@ -113,12 +247,35 @@ export default function StudentProfile() {
       // Create FormData to match your controller's @ModelAttribute and MultipartFile expectations
       const formData = new FormData();
       
+      // Helper function to convert ISO date format (yyyy-MM-dd) back to Indian format (dd-MM-yyyy) for backend
+      const convertISOToIndianDate = (isoDate) => {
+        if (!isoDate) return "";
+        
+        console.log('Converting ISO date to Indian format:', isoDate);
+        
+        // Check if it's in ISO format (yyyy-MM-dd)
+        if (isoDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [year, month, day] = isoDate.split('-');
+          const indianDate = `${day}-${month}-${year}`;
+          console.log('Converted ISO date', isoDate, 'to Indian:', indianDate);
+          return indianDate;
+        }
+        
+        // If already in Indian format, return as is
+        console.log('Date already in Indian format or unrecognized:', isoDate);
+        return isoDate;
+      };
+
       // Add profile fields as form data (matches @ModelAttribute UserProfileDto)
       if (info.name) formData.append('name', info.name);
       if (info.department) formData.append('department', info.department);
       if (info.phone) formData.append('phoneNumber', info.phone);
       if (info.regno) formData.append('registerNumber', info.regno);
-      if (info.dob) formData.append('dateOfBirth', info.dob);
+      if (info.dob) {
+        const indianDateFormat = convertISOToIndianDate(info.dob);
+        formData.append('dateOfBirth', indianDateFormat);
+        console.log('🎂 Sending date to backend in Indian format:', indianDateFormat);
+      }
       if (info.email) formData.append('email', info.email);
       
       // Add profile image file if selected (matches @RequestParam MultipartFile profileImage)
@@ -140,11 +297,16 @@ export default function StudentProfile() {
       
       // Log FormData contents
       console.log('=== FORM DATA CONTENTS ===');
+      console.log('Date of Birth field specifically:', info.dob, '(will be sent as dateOfBirth)');
       for (let [key, value] of formData.entries()) {
         if (value instanceof File) {
           console.log(`${key}: [FILE] ${value.name} (${value.size} bytes, ${value.type})`);
         } else {
           console.log(`${key}: "${value}" (type: ${typeof value}, length: ${value?.length || 'null'})`);
+          // Highlight dateOfBirth specifically
+          if (key === 'dateOfBirth') {
+            console.log(`🎂 DATE OF BIRTH: "${value}" - This will be stored in your backend!`);
+          }
         }
       }
       
@@ -167,17 +329,42 @@ export default function StudentProfile() {
       alert("Profile saved successfully!");
       setIsEditing(false); // Exit edit mode after saving
       
-      // Optionally update the form with the response data
+      // Update the form with the response data from backend
       if (updatedProfile) {
         console.log('Updating form with response data...');
+        
+        // Reuse the helper function to convert Indian date back to ISO for display
+        const convertIndianDateToISO = (indianDate) => {
+          if (!indianDate) return "";
+          
+          // Check if it's already in ISO format (yyyy-MM-dd)
+          if (indianDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            return indianDate;
+          }
+          
+          // Convert from dd-MM-yyyy to yyyy-MM-dd
+          if (indianDate.match(/^\d{2}-\d{2}-\d{4}$/)) {
+            const [day, month, year] = indianDate.split('-');
+            return `${year}-${month}-${day}`;
+          }
+          
+          return "";
+        };
+        
         setInfo({
           name: updatedProfile.name || updatedProfile.username || info.name,
-          dob: updatedProfile.dateOfBirth || info.dob,
-          phone: updatedProfile.phone ? String(updatedProfile.phone) : (updatedProfile.phoneNumber || info.phone),
+          dob: convertIndianDateToISO(updatedProfile.dateOfBirth) || info.dob,
+          phone: updatedProfile.phoneNumber || (updatedProfile.phone ? String(updatedProfile.phone) : info.phone), // Fix: use phoneNumber from backend
           email: updatedProfile.email || info.email,
           department: updatedProfile.department || info.department,
           regno: updatedProfile.registerNumber || info.regno,
         });
+        
+        // Update profile image if backend returned a new URL
+        if (updatedProfile.profileImageUrl) {
+          console.log('Updating profile image from save response:', updatedProfile.profileImageUrl);
+          setProfilePic(updatedProfile.profileImageUrl);
+        }
       }
       
     } catch (error) {
@@ -251,7 +438,7 @@ export default function StudentProfile() {
               name="name"
               value={info.name}
               onChange={handleChange}
-              className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+              className={`gradient-input ${!isEditing ? 'readonly' : ''} ${getFieldValidationClass('name')}`}
               readOnly={!isEditing}
             />
           </div>
@@ -264,7 +451,7 @@ export default function StudentProfile() {
                 name="dob"
                 value={info.dob}
                 onChange={handleChange}
-                className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+                className={`gradient-input ${!isEditing ? 'readonly' : ''} ${getFieldValidationClass('date')}`}
                 readOnly={!isEditing}
               />
             </div>
@@ -275,7 +462,7 @@ export default function StudentProfile() {
                 name="regno"
                 value={info.regno}
                 onChange={handleChange}
-                className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+                className={`gradient-input ${!isEditing ? 'readonly' : ''} ${getFieldValidationClass('register')}`}
                 readOnly={!isEditing}
               />
             </div>
@@ -285,12 +472,13 @@ export default function StudentProfile() {
             <div className="form-group">
               <label>Phone Number</label>
               <input
-                placeholder="Enter phone number"
+                placeholder="Enter phone number (10 digits, no spaces)"
                 name="phone"
                 value={info.phone}
                 onChange={handleChange}
-                className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+                className={`gradient-input ${!isEditing ? 'readonly' : ''} ${getFieldValidationClass('phone')}`}
                 readOnly={!isEditing}
+                maxLength="10"
               />
             </div>
             <div className="form-group">
@@ -301,7 +489,7 @@ export default function StudentProfile() {
                 name="email"
                 value={info.email}
                 onChange={handleChange}
-                className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+                className={`gradient-input ${!isEditing ? 'readonly' : ''} ${getFieldValidationClass('email')}`}
                 readOnly={!isEditing}
               />
             </div>
@@ -314,7 +502,7 @@ export default function StudentProfile() {
               name="department"
               value={info.department}
               onChange={handleChange}
-              className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+              className={`gradient-input ${!isEditing ? 'readonly' : ''} ${getFieldValidationClass('department')}`}
               readOnly={!isEditing}
             />
           </div>
@@ -668,6 +856,44 @@ export default function StudentProfile() {
 
         .edit-btn.editing:hover {
           background: #c82333;
+        }
+
+        /* Validation styles */
+        .gradient-input.invalid {
+          border-color: #dc3545 !important;
+          background-color: #fff5f5 !important;
+          box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2) !important;
+        }
+
+        .gradient-input.invalid:focus {
+          border-color: #dc3545 !important;
+          box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3) !important;
+        }
+
+        /* Validation helper text */
+        .validation-helper {
+          font-size: 0.85rem;
+          color: #666;
+          margin-top: 0.25rem;
+          font-style: italic;
+        }
+
+        .validation-error {
+          font-size: 0.85rem;
+          color: #dc3545;
+          margin-top: 0.25rem;
+          font-weight: 500;
+        }
+
+        /* Phone number specific styling */
+        input[name="phone"]::-webkit-outer-spin-button,
+        input[name="phone"]::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+        input[name="phone"] {
+          -moz-appearance: textfield;
         }
       `}</style>
     </div>
