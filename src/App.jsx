@@ -55,7 +55,7 @@ function App() {
   }
 
   // ✅ Logged in → route based on user role
-  if (user.role === "faculty") {
+  if (user.role === "FACULTY" || user.role === "faculty") {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
