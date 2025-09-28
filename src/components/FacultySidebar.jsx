@@ -26,15 +26,15 @@ export default function FacultySidebar({ open = false, onClose }) {
 
   const navItems = [
     { to: "/faculty", label: "Dashboard" },
+    { to: "/faculty/reports", label: "Pending Requests" },
     { to: "/faculty/students", label: "Student Management" },
     { to: "/faculty/grades", label: "Grade Management" },
-    { to: "/faculty/reports", label: "Reports" },
   ];
 
   return (
     <div className={`sidebar ${open ? "sidebar-open" : ""}`}>
       <div className="sidebar-top">
-        <h2 className="sidebar-title">Faculty Hub</h2>
+        <h2 className="sidebar-title">Facult Hub</h2>
         <nav className="sidebar-nav">
           {navItems.map((item, i) => (
             <NavLink
