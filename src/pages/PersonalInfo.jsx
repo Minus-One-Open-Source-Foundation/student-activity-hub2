@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { profileAPI } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function StudentProfile() {
+  const { user } = useAuth();
   const [info, setInfo] = useState({
     name: "",
     dob: "",
@@ -11,13 +14,189 @@ export default function StudentProfile() {
   });
 
   const [profilePic, setProfilePic] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Load profile data from backend on component mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      console.log('Starting profile load for user:', user);
+      
+      if (user?.email) {
+        console.log('User email found:', user.email);
+        try {
+          // Try the standard approach first, then fallback to email-based
+          let profileData;
+          try {
+            console.log('Attempting standard getUserProfile...');
+            profileData = await profileAPI.getUserProfile();
+            console.log('Standard approach successful:', profileData);
+          } catch (authError) {
+            console.log('Standard auth failed, error details:', {
+              message: authError.message,
+              status: authError.response?.status,
+              data: authError.response?.data
+            });
+            console.log('Trying email-based approach with email:', user.email);
+            profileData = await profileAPI.getUserProfileByEmail(user.email);
+            console.log('Email-based approach successful:', profileData);
+          }
+          
+          console.log('Raw profile data from backend:', JSON.stringify(profileData, null, 2));
+          
+          // Map backend data to frontend structure (matching your UserService DTO structure)
+          setInfo({
+            name: profileData.name || profileData.username || "",
+            dob: profileData.dateOfBirth || "", // Note: Your backend doesn't have dateOfBirth field
+            phone: profileData.phone ? String(profileData.phone) : "", // Backend phone field is Long, convert to string for display
+            email: profileData.email || user.email || "",
+            department: profileData.department || "",
+            regno: profileData.registerNumber || "",
+          });
+          
+          console.log('Mapped profile info:', {
+            name: profileData.name || profileData.username || "",
+            phone: profileData.phone ? String(profileData.phone) : "",
+            email: profileData.email,
+            department: profileData.department,
+            registerNumber: profileData.registerNumber
+          });
+        } catch (error) {
+          console.error('Failed to load profile:', error);
+          
+          // Show specific error messages to help debug
+          if (error.message.includes('Authentication required')) {
+            alert('Please log in again to access your profile.');
+            // Optionally redirect to login
+          } else if (error.message.includes('Profile not found')) {
+            console.log('No existing profile found, starting with empty form');
+          }
+          
+          // If profile doesn't exist or error occurs, initialize with user data
+          console.log('Setting fallback user info with email:', user.email);
+          setInfo(prev => ({
+            ...prev,
+            email: user.email || "",
+            name: user.name || user.username || ""  // Set any available name from user context
+          }));
+        }
+      } else {
+        console.log('No user email available, skipping profile load. User object:', user);
+      }
+      setLoading(false);
+    };
+
+    console.log('PersonalInfo component mounted/updated. User:', user);
+    
+    // Load profile when we have a user email
+    loadProfile();
+  }, [user]);
 
   const handleChange = (e) => {
     setInfo({ ...info, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    alert("Student Profile Saved:\n" + JSON.stringify(info, null, 2));
+  const handleSave = async () => {
+    if (!user?.email) {
+      alert('Please log in to save profile');
+      return;
+    }
+
+    setSaving(true);
+    
+    console.log('=== PROFILE SAVE DEBUG START ===');
+    console.log('Current form info state:', JSON.stringify(info, null, 2));
+    console.log('User context:', JSON.stringify(user, null, 2));
+    
+    try {
+      // Create FormData to match your controller's @ModelAttribute and MultipartFile expectations
+      const formData = new FormData();
+      
+      // Add profile fields as form data (matches @ModelAttribute UserProfileDto)
+      if (info.name) formData.append('name', info.name);
+      if (info.department) formData.append('department', info.department);
+      if (info.phone) formData.append('phoneNumber', info.phone);
+      if (info.regno) formData.append('registerNumber', info.regno);
+      if (info.dob) formData.append('dateOfBirth', info.dob);
+      if (info.email) formData.append('email', info.email);
+      
+      // Add profile image file if selected (matches @RequestParam MultipartFile profileImage)
+      if (profilePic && document.getElementById('fileInput').files[0]) {
+        const imageFile = document.getElementById('fileInput').files[0];
+        formData.append('profileImage', imageFile);
+        console.log('Profile image file added:', {
+          name: imageFile.name,
+          size: imageFile.size,
+          type: imageFile.type
+        });
+      }
+
+      console.log('=== DATA BEING SENT TO BACKEND ===');
+      console.log('Using FormData (multipart/form-data) format for @ModelAttribute');
+      console.log('User Email for API call:', user.email);
+      console.log('API Endpoint: PUT /api/profile/user/' + encodeURIComponent(user.email));
+      console.log('Request Headers will include: Authorization: Bearer ' + (localStorage.getItem('token') ? '[TOKEN_PRESENT]' : '[NO_TOKEN]'));
+      
+      // Log FormData contents
+      console.log('=== FORM DATA CONTENTS ===');
+      for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`${key}: [FILE] ${value.name} (${value.size} bytes, ${value.type})`);
+        } else {
+          console.log(`${key}: "${value}" (type: ${typeof value}, length: ${value?.length || 'null'})`);
+        }
+      }
+      
+      // Use the email-based approach that matches your ProfileController
+      console.log('=== API CALL START ===');
+      console.log('Calling updateUserProfileByEmailWithFile with:');
+      console.log('  - Email (path param):', user.email);
+      console.log('  - Form Data (multipart):', 'FormData object with', formData.entries ? [...formData.entries()].length : 'unknown', 'entries');
+      
+      const updatedProfile = await profileAPI.updateUserProfileByEmailWithFile(user.email, formData);
+      
+      console.log('=== API RESPONSE RECEIVED ===');
+      console.log('Updated Profile Response:', JSON.stringify(updatedProfile, null, 2));
+      console.log('Response type:', typeof updatedProfile);
+      if (updatedProfile && typeof updatedProfile === 'object') {
+        console.log('Response keys:', Object.keys(updatedProfile));
+      }
+      
+      console.log('=== SAVE SUCCESS ===');
+      alert("Profile saved successfully!");
+      setIsEditing(false); // Exit edit mode after saving
+      
+      // Optionally update the form with the response data
+      if (updatedProfile) {
+        console.log('Updating form with response data...');
+        setInfo({
+          name: updatedProfile.name || updatedProfile.username || info.name,
+          dob: updatedProfile.dateOfBirth || info.dob,
+          phone: updatedProfile.phone ? String(updatedProfile.phone) : (updatedProfile.phoneNumber || info.phone),
+          email: updatedProfile.email || info.email,
+          department: updatedProfile.department || info.department,
+          regno: updatedProfile.registerNumber || info.regno,
+        });
+      }
+      
+    } catch (error) {
+      console.error('=== SAVE ERROR ===');
+      console.error('Error object:', error);
+      console.error('Error message:', error.message);
+      console.error('Error response:', error.response);
+      console.error('Error response data:', error.response?.data);
+      console.error('Error response status:', error.response?.status);
+      
+      alert("Failed to save profile: " + (error.message || 'Unknown error'));
+    } finally {
+      setSaving(false);
+      console.log('=== PROFILE SAVE DEBUG END ===');
+    }
+  };
+
+  const toggleEditMode = () => {
+    setIsEditing(!isEditing);
   };
 
   const handlePicUpload = (e) => {
@@ -31,14 +210,22 @@ export default function StudentProfile() {
     <div className="profile-wrapper">
       <h2 className="title">Student Profile</h2>
 
+
       <div className="profile-card">
         <div className="profile-left">
-          {/* Clickable circle instead of choose file button */}
-          <label htmlFor="fileInput" className="pic-box">
+          {/* Clickable circle for profile picture */}
+          <label htmlFor="fileInput" className={`pic-box ${isEditing ? 'editable' : ''}`}>
             {profilePic ? (
               <img src={profilePic} alt="Profile" />
             ) : (
-              <div className="placeholder">Upload Photo</div>
+              <div className="placeholder">
+                {isEditing ? 'Click to Upload Photo' : 'Profile Photo'}
+              </div>
+            )}
+            {isEditing && (
+              <div className="edit-overlay">
+                <span>📷</span>
+              </div>
             )}
           </label>
           <input
@@ -47,10 +234,13 @@ export default function StudentProfile() {
             accept="image/*"
             onChange={handlePicUpload}
             style={{ display: "none" }}
+            disabled={!isEditing}
           />
 
           {/* Edit Profile Button */}
-          <button className="edit-btn">Edit Profile</button>
+          <button className="edit-btn" onClick={toggleEditMode}>
+            {isEditing ? 'Cancel Edit' : 'Edit Profile'}
+          </button>
         </div>
 
         <div className="profile-right">
@@ -61,7 +251,8 @@ export default function StudentProfile() {
               name="name"
               value={info.name}
               onChange={handleChange}
-              className="gradient-input"
+              className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+              readOnly={!isEditing}
             />
           </div>
 
@@ -73,7 +264,8 @@ export default function StudentProfile() {
                 name="dob"
                 value={info.dob}
                 onChange={handleChange}
-                className="gradient-input"
+                className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+                readOnly={!isEditing}
               />
             </div>
             <div className="form-group">
@@ -83,7 +275,8 @@ export default function StudentProfile() {
                 name="regno"
                 value={info.regno}
                 onChange={handleChange}
-                className="gradient-input"
+                className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+                readOnly={!isEditing}
               />
             </div>
           </div>
@@ -96,7 +289,8 @@ export default function StudentProfile() {
                 name="phone"
                 value={info.phone}
                 onChange={handleChange}
-                className="gradient-input"
+                className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+                readOnly={!isEditing}
               />
             </div>
             <div className="form-group">
@@ -107,7 +301,8 @@ export default function StudentProfile() {
                 name="email"
                 value={info.email}
                 onChange={handleChange}
-                className="gradient-input"
+                className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+                readOnly={!isEditing}
               />
             </div>
           </div>
@@ -119,15 +314,27 @@ export default function StudentProfile() {
               name="department"
               value={info.department}
               onChange={handleChange}
-              className="gradient-input"
+              className={`gradient-input ${!isEditing ? 'readonly' : ''}`}
+              readOnly={!isEditing}
             />
           </div>
 
-          <button className="save-btn" onClick={handleSave}>
-            Save Profile
-          </button>
+          {isEditing && (
+            <button className="save-btn" onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          )}
         </div>
       </div>
+
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-content">
+            <div className="spinner"></div>
+            <p>Loading profile...</p>
+          </div>
+        </div>
+      )}
 
       <style>{`
         :root {
@@ -365,6 +572,102 @@ export default function StudentProfile() {
         .gradient-input::placeholder {
           color: #666;
           opacity: 0.8;
+        }
+
+        /* Loading overlay styles */
+        .loading-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        }
+
+        .loading-content {
+          background: white;
+          padding: 2rem;
+          border-radius: 12px;
+          text-align: center;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid #f3f3f3;
+          border-top: 3px solid #ff6a00;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        /* Disabled button styles */
+        .save-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        /* Read-only input styles */
+        .gradient-input.readonly {
+          background-color: #f5f5f5 !important;
+          color: #666;
+          cursor: default;
+          border-color: #e0e0e0;
+        }
+
+        .gradient-input.readonly:focus {
+          box-shadow: none;
+          border-color: #e0e0e0;
+        }
+
+        /* Profile picture edit styles */
+        .pic-box.editable {
+          cursor: pointer;
+          border-color: var(--secondary);
+        }
+
+        .pic-box.editable:hover {
+          border-color: var(--primary);
+          transform: scale(1.02);
+        }
+
+        .edit-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 2rem;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          border-radius: 50%;
+        }
+
+        .pic-box.editable:hover .edit-overlay {
+          opacity: 1;
+        }
+
+        /* Edit button states */
+        .edit-btn.editing {
+          background: #dc3545;
+        }
+
+        .edit-btn.editing:hover {
+          background: #c82333;
         }
       `}</style>
     </div>
