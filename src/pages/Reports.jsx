@@ -109,8 +109,8 @@ export default function Reports() {
   }
 
   return (
-    <div className="pending-requests-wrapper">
-      <h2 className="page-title">{filter.charAt(0) + filter.slice(1).toLowerCase()} Requests</h2>
+    <div className="hackathons-requests-wrapper">
+      <h2 className="page-title">Hackathons And Workshops Requests</h2>
       <div className="filter-btn-group">
         <button className={`filter-btn pending-btn ${filter === 'PENDING' ? 'active' : ''}`} onClick={() => setFilter('PENDING')}>
           <FaClock style={{marginRight: '0.5em'}} /> Pending
@@ -198,7 +198,7 @@ export default function Reports() {
       )}
 
   <style>{`
-        .pending-requests-wrapper {
+        .hackathons-requests-wrapper {
           min-height: 100vh;
           padding: 2rem;
           font-family: 'Inter', sans-serif;
@@ -509,7 +509,7 @@ export default function Reports() {
         
         /* Responsive Design */
         @media (max-width: 768px) {
-          .pending-requests-wrapper {
+          .hackathons-requests-wrapper {
             padding: 1rem;
           }
           .request-box {

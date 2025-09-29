@@ -30,7 +30,7 @@ export default function Sidebar({ open = false, onClose }) {
     { to: "/academic-records", label: "Academic Records" },
     { to: "/hackathons-workshops", label: "Hackathons & Workshops" }, // Added
     { to: "/internships", label: "Internships" }, // Added
-    { to: "/activities", label: "Activities" },
+  { to: "/activities", label: "Co-Curricular" },
     { to: "/achievements", label: "Achievements" },
     { to: "/portfolio", label: "Portfolio" },
     { to: "/analytics", label: "Analytics" },
