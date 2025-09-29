@@ -18,6 +18,7 @@ import Portfolio from "./pages/Portfolio";
 import Analytics from "./pages/Analytics";
 import HackWorkshops from "./pages/HackWorkshops";
 import Internships from "./pages/Internships";
+import URMS from "./pages/URMS";
 
 // Faculty Pages
 import FacultyDashboard from "./pages/FacultyDashboard";
@@ -92,6 +93,7 @@ function App() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/hackathons-workshops" element={<HackWorkshops />} />
           <Route path="/internships" element={<Internships />} />
+          <Route path="/urms" element={<URMS />} />
 
           {/* 🚦 Default Redirect → Student Dashboard */}
           <Route path="*" element={<Navigate to="/" replace />} />

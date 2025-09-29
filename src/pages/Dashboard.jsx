@@ -7,11 +7,31 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Get user information from localStorage or context
+  const getUserInfo = () => {
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        console.log('Dashboard - User data from localStorage:', parsedUser);
+        return parsedUser;
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        return null;
+      }
+    }
+    console.log('Dashboard - User data from context:', user);
+    return user;
+  };
+
+  const currentUser = getUserInfo();
+
   const [personalInfo] = useState({
-    name: "John Doe",
-    dob: "2000-01-01",
-    phone: "9876543210",
-    address: "123, College Street",
+    name: currentUser?.username || currentUser?.name || "Student",
+    dob: currentUser?.dateOfBirth || "Not specified", 
+    phone: currentUser?.phone || currentUser?.phoneNumber || "Not specified",
+    address: "Not specified",
+    email: currentUser?.email || "Not specified",
   });
 
   const [activities] = useState([
@@ -82,7 +102,7 @@ export default function Dashboard() {
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-content">
-        <h1 className="title">Welcome, <span>{personalInfo.name}</span></h1>
+        <h1 className="title">Welcome, <span>{personalInfo.name || "Student"}</span></h1>
         <p className="subtitle">Student Dashboard</p>
 
         {/* Stats Section */}
@@ -111,11 +131,11 @@ export default function Dashboard() {
           {/* URMS Card */}
           <div
             className="glass-card"
-            onClick={() => navigate("/portfolio")}
+            onClick={() => navigate("/urms")}
             style={{ cursor: "pointer" }}
             >
             <h3>URMS</h3>
-            <p className="description">Access your unified resource management system.</p>
+            <p className="description">Manage your role-based resumes for different companies.</p>
           </div>
 
           {/* Academic Records Card */}

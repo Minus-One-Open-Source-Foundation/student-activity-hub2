@@ -129,9 +129,14 @@ export default function StudentProfile() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Prevent email changes - email can only be changed through Transfer Account
+    // Prevent email and register number changes
     if (name === 'email') {
       console.log('Email changes are not allowed through edit profile. Use Transfer Account instead.');
+      return;
+    }
+    
+    if (name === 'regno') {
+      console.log('Register number changes are not allowed.');
       return;
     }
     
@@ -202,14 +207,8 @@ export default function StudentProfile() {
       errors.push('Department name must be at least 2 characters long');
     }
 
-    // Register number validation
-    if (!info.regno || info.regno.trim().length === 0) {
-      errors.push('Register number is required');
-    } else if (info.regno.trim().length < 3) {
-      errors.push('Register number must be at least 3 characters long');
-    } else if (!/^[a-zA-Z0-9]+$/.test(info.regno.trim())) {
-      errors.push('Register number can only contain letters and numbers (no spaces or special characters)');
-    }
+    // Register number validation - skipped as it's now read-only
+    // The register number is pre-populated from the backend and cannot be modified
 
     // Date of birth validation
     if (!info.dob) {
@@ -480,14 +479,29 @@ export default function StudentProfile() {
             </div>
             <div className="form-group">
               <label>Register Number</label>
-              <input
-                placeholder="Enter register number"
-                name="regno"
-                value={info.regno}
-                onChange={handleChange}
-                className={`gradient-input ${!isEditing ? 'readonly' : ''} ${getFieldValidationClass('register')}`}
-                readOnly={!isEditing}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  placeholder="Enter register number"
+                  name="regno"
+                  value={info.regno}
+                  onChange={handleChange}
+                  className="gradient-input readonly"
+                  readOnly={true}
+                  style={{
+                    cursor: 'not-allowed',
+                    backgroundColor: '#f5f5f5',
+                    color: '#666'
+                  }}
+                />
+                <small style={{
+                  display: 'block',
+                  marginTop: '4px',
+                  color: '#888',
+                  fontSize: '0.8rem'
+                }}>
+                  Register number cannot be modified
+                </small>
+              </div>
             </div>
           </div>
 
@@ -709,13 +723,13 @@ export default function StudentProfile() {
           background: #ffffff;
           border: 1px solid var(--border);
           border-radius: 20px;
-          padding: 3rem;
+          padding: 2rem;
           width: 100%;
           max-width: 1100px;
           min-height: 60vh;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
           display: flex;
-          gap: 2.5rem;
+          gap: 2rem;
           animation: fadeIn 0.5s ease-in-out;
         }
 
@@ -781,7 +795,7 @@ export default function StudentProfile() {
         }
 
         .form-group {
-          margin-bottom: 2.4rem;
+          margin-bottom: 1.2rem;
           display: flex;
           flex-direction: column;
         }
@@ -813,7 +827,7 @@ export default function StudentProfile() {
 
         .form-row {
           display: flex;
-          gap: 2.4rem;
+          gap: 1.5rem;
         }
 
         .save-btn {
@@ -876,14 +890,14 @@ export default function StudentProfile() {
           display: flex;
           justify-content: space-between;
           gap: 1.5rem;
-          margin-bottom: 1.5rem;
+          margin-bottom: 0.5rem;
         }
         .form-group {
           flex: 1;
         }
         .form-group label {
           display: block;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.3rem;
           font-weight: 600;
           color: #333;
         }

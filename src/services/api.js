@@ -625,4 +625,46 @@ export const achievementAPI = {
   }
 };
 
+// Resume API for URMS (Unified Resume Management System)
+export const resumeAPI = {
+  // Get all resumes for a user
+  getUserResumes: async (userEmail) => {
+    const response = await api.get(`/resumes/user/${encodeURIComponent(userEmail)}`);
+    return response.data;
+  },
+
+  // Upload a new resume
+  uploadResume: async (userEmail, role, file) => {
+    const formData = new FormData();
+    formData.append('userEmail', userEmail);
+    formData.append('role', role);
+    formData.append('file', file);
+
+    const response = await api.post('/resumes/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Get resume by ID
+  getResumeById: async (userEmail, id) => {
+    const response = await api.get(`/resumes/${id}/user/${encodeURIComponent(userEmail)}`);
+    return response.data;
+  },
+
+  // Delete resume
+  deleteResume: async (userEmail, id) => {
+    const response = await api.delete(`/resumes/${id}/user/${encodeURIComponent(userEmail)}`);
+    return response.data;
+  },
+
+  // Get download URL for resume
+  getDownloadUrl: async (userEmail, id) => {
+    const response = await api.get(`/resumes/${id}/download/user/${encodeURIComponent(userEmail)}`);
+    return response.data; // This will be the download URL
+  }
+};
+
 export default api;
