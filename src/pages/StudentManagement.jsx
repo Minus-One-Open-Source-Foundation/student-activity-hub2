@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaTrash } from "react-icons/fa";
 
 export default function StudentManagement() {
   const [students, setStudents] = useState([
@@ -39,16 +39,40 @@ export default function StudentManagement() {
   ]);
 
   const [search, setSearch] = useState("");
-
-  const handleDelete = (id) => {
-    setStudents(students.filter((student) => student.id !== id));
-  };
+  const [studentToDelete, setStudentToDelete] = useState(null);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [showReasonPopup, setShowReasonPopup] = useState(false);
+  const [deleteReason, setDeleteReason] = useState("");
 
   const filteredStudents = students.filter(
     (s) =>
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.regno.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleDeleteClick = (student) => {
+    setStudentToDelete(student);
+    setShowConfirmPopup(true);
+  };
+
+  const confirmDelete = () => {
+    setShowConfirmPopup(false);
+    setShowReasonPopup(true);
+  };
+
+  const submitReason = () => {
+    if (deleteReason.trim() === "") {
+      alert("Please enter a reason for deletion.");
+      return;
+    }
+    setStudents(students.filter((s) => s.id !== studentToDelete.id));
+    console.log(
+      `Student ${studentToDelete.name} deleted. Reason: ${deleteReason}`
+    );
+    setDeleteReason("");
+    setStudentToDelete(null);
+    setShowReasonPopup(false);
+  };
 
   return (
     <div className="student-management">
@@ -75,6 +99,21 @@ export default function StudentManagement() {
         <div className="student-grid">
           {filteredStudents.map((student) => (
             <div className="student-card" key={student.id}>
+              {/* Delete Button */}
+              <button
+                className="delete-button"
+                onClick={() => handleDeleteClick(student)}
+              >
+                <FaTrash />
+              </button>
+
+              {/* Profile Photo */}
+              <div className="profile-section">
+                <div className="profile-photo">
+                  <img src={student.profilePic} alt={student.name} />
+                </div>
+              </div>
+
               {/* Student Info */}
               <div className="student-info">
                 <h2>{student.name}</h2>
@@ -101,19 +140,6 @@ export default function StudentManagement() {
                   {student.status}
                 </span>
               </div>
-
-              {/* Profile Photo + Delete Account */}
-              <div className="profile-section">
-                <div className="profile-photo">
-                  <img src={student.profilePic} alt={student.name} />
-                </div>
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDelete(student.id)}
-                >
-                  Delete Account
-                </button>
-              </div>
             </div>
           ))}
 
@@ -122,6 +148,42 @@ export default function StudentManagement() {
           )}
         </div>
       </div>
+
+      {/* Confirmation Popup */}
+      {showConfirmPopup && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3>Confirm Deletion</h3>
+            <p>
+              Are you sure you want to delete{" "}
+              <strong>{studentToDelete?.name}</strong>?
+            </p>
+            <div className="popup-actions">
+              <button onClick={() => setShowConfirmPopup(false)}>Cancel</button>
+              <button onClick={confirmDelete}>Confirm Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reason Popup */}
+      {showReasonPopup && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3>Reason for Deletion</h3>
+            <textarea
+              rows="4"
+              placeholder="Enter reason..."
+              value={deleteReason}
+              onChange={(e) => setDeleteReason(e.target.value)}
+            />
+            <div className="popup-actions">
+              <button onClick={() => setShowReasonPopup(false)}>Cancel</button>
+              <button onClick={submitReason}>Submit</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Styles */}
       <style>{`
@@ -212,8 +274,9 @@ export default function StudentManagement() {
         }
 
         .student-card {
+          position: relative;
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-start;
           align-items: flex-start;
           background: white;
           border-radius: 12px;
@@ -228,15 +291,70 @@ export default function StudentManagement() {
           box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
 
+        /* Delete Button */
+        .delete-button {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          width: 1cm;
+          height: 1cm;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: none;
+          border-radius: 4px;
+          background: #f87171;
+          color: white;
+          cursor: pointer;
+          font-size: 1rem;
+        }
+
+        .delete-button:hover {
+          background: #dc2626;
+        }
+
+        .profile-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          margin-left: 1cm;
+          margin-top: 1cm;
+        }
+
+        .profile-photo {
+          width: 160px;
+          height: 160px;
+          border-radius: 50%;
+          overflow: hidden;
+          border: 3px solid #d1d5db;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .profile-photo img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+
+        .profile-photo:hover img {
+          transform: scale(1.05);
+        }
+
         .student-info {
           flex: 2;
+          margin-left: 1.5cm;
         }
 
         .student-info h2 {
-         font-size: 1.3rem;
-         margin-bottom: 0.4rem; /* keep spacing below unchanged */
-         position: relative;
-         top: -4px; /* move slightly upwards */
+          font-size: 1.3rem;
+          margin-bottom: 0.4rem;
+          position: relative;
+          top: -4px;
         }
 
         .student-info p {
@@ -263,59 +381,78 @@ export default function StudentManagement() {
           color: #b91c1c;
         }
 
-        .profile-section {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          margin-left: 1rem;
-        }
-
-        .profile-photo {
-          width: 160px;
-          height: 160px;
-          border-radius: 50%;
-          overflow: hidden;
-          border: 3px solid #d1d5db;
-          box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-          margin-bottom: 1rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .profile-photo img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.3s ease;
-        }
-
-        .profile-photo:hover img {
-          transform: scale(1.05);
-        }
-
-        .delete-btn {
-          background: #ef4444;
-          color: white;
-          padding: 0.7rem 1.4rem;
-          border: none;
-          border-radius: 8px;
-          font-size: 0.95rem;
-          cursor: pointer;
-          font-weight: 500;
-          transition: all 0.2s ease;
-        }
-
-        .delete-btn:hover {
-          background: #dc2626;
-          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-        }
-
         .no-data {
           text-align: center;
           font-size: 1rem;
           color: #6b7280;
+        }
+
+        /* Popup Styles */
+        .popup-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+
+        .popup {
+          background: white;
+          padding: 2rem;
+          border-radius: 12px;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+          max-width: 400px;
+          width: 100%;
+          text-align: center;
+        }
+
+        .popup h3 {
+          margin-bottom: 1rem;
+        }
+
+        .popup p {
+          margin-bottom: 1.2rem;
+        }
+
+        .popup textarea {
+          width: 100%;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          padding: 0.8rem;
+          resize: none;
+          font-size: 0.95rem;
+          margin-bottom: 1rem;
+        }
+
+        .popup-actions {
+          display: flex;
+          justify-content: space-between;
+        }
+
+        .popup-actions button {
+          flex: 1;
+          margin: 0 0.3rem;
+          padding: 0.6rem;
+          border: none;
+          border-radius: 8px;
+          font-size: 0.95rem;
+          cursor: pointer;
+          font-weight: 600;
+        }
+
+        .popup-actions button:first-child {
+          background: #e5e7eb;
+          color: #374151;
+        }
+
+        .popup-actions button:last-child {
+          background: #ef4444;
+          color: white;
         }
 
         @media (max-width: 768px) {
@@ -325,12 +462,18 @@ export default function StudentManagement() {
           }
 
           .profile-section {
-            margin-top: 1rem;
+            margin-bottom: 1rem;
+            margin-left: 0;
+            margin-top: 0;
           }
 
           .profile-photo {
             width: 140px;
             height: 140px;
+          }
+
+          .student-info {
+            margin-left: 0;
           }
         }
       `}</style>
