@@ -1,41 +1,84 @@
 import React, { useState } from "react";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaDownload } from "react-icons/fa";
 
-export default function Portfolio() {
-  const [files, setFiles] = useState([]);
+export default function ResumeManagement() {
+  const [resumes, setResumes] = useState([]);
 
   const handleUpload = (e) => {
-    const uploaded = Array.from(e.target.files);
-    const newFiles = uploaded.filter(
-      (file) => !files.some((f) => f.name === file.name)
-    );
-    setFiles([...files, ...newFiles]);
+    const uploadedFiles = Array.from(e.target.files);
+    const newResumes = uploadedFiles.map((file) => ({
+      file,
+      role: "",
+    }));
+    setResumes([...resumes, ...newResumes]);
   };
 
-  const handleDelete = (fileName) => {
-    setFiles(files.filter((f) => f.name !== fileName));
+  const handleDelete = (index) => {
+    setResumes(resumes.filter((_, i) => i !== index));
+  };
+
+  const handleRoleChange = (index, role) => {
+    const updatedResumes = [...resumes];
+    updatedResumes[index].role = role;
+    setResumes(updatedResumes);
+  };
+
+  const handleDownload = (file) => {
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = file.name;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="portfolio-wrapper">
+    <div className="resume-management-wrapper">
       <header>
-        <h1>Digital Portfolio</h1>
-        <p>Upload and manage your documents</p>
+        <h1>Unified Resume Management System</h1>
+        <p>Upload, preview, and manage your resumes</p>
       </header>
 
       <label className="upload-btn">
-        Upload Documents
-        <input type="file" hidden multiple onChange={handleUpload} />
+        Upload Resumes
+        <input
+          type="file"
+          hidden
+          multiple
+          accept="application/pdf"
+          onChange={handleUpload}
+        />
       </label>
 
-      <section className="files-container">
-        {files.length === 0 ? (
-          <div className="empty">No documents uploaded yet.</div>
+      <section className="resumes-container">
+        {resumes.length === 0 ? (
+          <div className="empty">No resumes uploaded yet.</div>
         ) : (
-          files.map((file, i) => (
-            <div key={i} className="file-card">
-              <span>{file.name}</span>
-              <button onClick={() => handleDelete(file.name)}>
+          resumes.map((resume, index) => (
+            <div key={index} className="resume-card">
+              <div className="resume-preview">
+                <iframe
+                  src={URL.createObjectURL(resume.file)}
+                  title="Resume Preview"
+                  style={{
+                    width: "200px",
+                    height: "200px",
+                    border: "none",
+                    aspectRatio: "1 / 1",
+                  }}
+                ></iframe>
+              </div>
+              <input
+                type="text"
+                placeholder="Enter role description"
+                value={resume.role}
+                onChange={(e) => handleRoleChange(index, e.target.value)}
+              />
+              <p className="role-display">Role: {resume.role}</p>
+              <button onClick={() => handleDownload(resume.file)}>
+                <FaDownload />
+              </button>
+              <button onClick={() => handleDelete(index)}>
                 <FaTrash />
               </button>
             </div>
@@ -44,7 +87,7 @@ export default function Portfolio() {
       </section>
 
       <style>{`
-        .portfolio-wrapper {
+        .resume-management-wrapper {
           min-height: 100vh;
           padding: 3rem 2rem;
           background: url("/src/assets/bg.jpg") no-repeat center center fixed;
@@ -63,7 +106,6 @@ export default function Portfolio() {
           color: #000;
           margin-bottom: 0.5rem;
         }
-
 
         header p {
           font-size: 1rem;
@@ -87,29 +129,54 @@ export default function Portfolio() {
           box-shadow: 0 6px 20px rgba(0,0,0,0.15);
         }
 
-        .files-container {
+        .resumes-container {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
           gap: 1.5rem;
         }
 
-        .file-card {
+        .resume-card {
           background: #f9f9f9;
           border-radius: 16px;
           padding: 1rem 1.5rem;
           display: flex;
-          justify-content: space-between;
-          align-items: center;
+          flex-direction: column;
+          gap: 0.5rem;
           font-weight: 600;
           transition: transform 0.25s, box-shadow 0.25s;
+          align-items: center;
         }
 
-        .file-card:hover {
+        .resume-card:hover {
           transform: translateY(-4px);
           box-shadow: 0 12px 28px rgba(0,0,0,0.1);
         }
 
-        .file-card button {
+        .resume-preview {
+          width: 200px;
+          height: 200px;
+          background: #e0e0e0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+
+        .resume-card input {
+          padding: 0.5rem;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          width: 90%;
+        }
+
+        .role-display {
+          font-size: 0.9rem;
+          color: #555;
+        }
+
+        .resume-card button {
           background: none;
           border: none;
           color: #ff4b5c;

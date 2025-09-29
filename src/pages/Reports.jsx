@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaClock, FaCheck, FaTimes, FaSpinner } from "react-icons/fa";
+import { FaClock, FaCheck, FaTimes, FaSpinner, FaSearch } from "react-icons/fa";
 import { facultyAPI } from "../services/api";
 
 export default function Reports() {
@@ -8,6 +8,8 @@ export default function Reports() {
   const [error, setError] = useState(null);
   const [processingId, setProcessingId] = useState(null);
   const [filter, setFilter] = useState('PENDING');
+  const [modalImage, setModalImage] = useState(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchRequestsByStatus(filter);
@@ -84,6 +86,12 @@ export default function Reports() {
     }
   };
 
+  const filteredRequests = requests.filter(
+    (req) =>
+      req.title.toLowerCase().includes(search.toLowerCase()) ||
+      req.userEmail.toLowerCase().includes(search.toLowerCase())
+  );
+
   if (loading) {
     return (
       <div className="pending-requests-wrapper">
@@ -111,6 +119,21 @@ export default function Reports() {
   return (
     <div className="pending-requests-wrapper">
       <h2 className="page-title">{filter.charAt(0) + filter.slice(1).toLowerCase()} Requests</h2>
+      
+      {/* Search Bar */}
+      <div className="search-bar">
+        <div className="search-wrapper">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search by title or student email..."
+            className="search-input"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
       <div className="filter-btn-group">
         <button className={`filter-btn pending-btn ${filter === 'PENDING' ? 'active' : ''}`} onClick={() => setFilter('PENDING')}>
           <FaClock style={{marginRight: '0.5em'}} /> Pending
@@ -123,12 +146,12 @@ export default function Reports() {
         </button>
       </div>
 
-      {requests.length === 0 ? (
+      {filteredRequests.length === 0 ? (
         <div className="no-requests">
-          <p>No {filter.toLowerCase()} requests at the moment.</p>
+          <p>No {filter.toLowerCase()} requests match your search.</p>
         </div>
       ) : (
-        requests.map((req) => (
+        filteredRequests.map((req) => (
           <div className="request-box" key={req.id}>
             <div className="request-box-inner">
               <div className="request-details">
@@ -177,6 +200,58 @@ export default function Reports() {
                       </button>
                     </div>
                   )}
+                  {filter === 'APPROVED' && (
+                    <button 
+                      className="reject-btn"
+                      onClick={async () => {
+                        try {
+                          setProcessingId(req.id);
+                          await facultyAPI.rejectEvent(req.id); // Call API to reject the event
+                          setRequests(requests.filter(request => request.id !== req.id)); // Remove the card from current list
+                          alert('Event rejected successfully!');
+                        } catch (err) {
+                          console.error('Error rejecting event:', err);
+                          alert('Failed to reject event. Please try again.');
+                        } finally {
+                          setProcessingId(null);
+                        }
+                      }}
+                      disabled={processingId === req.id}
+                    >
+                      {processingId === req.id ? (
+                        <FaSpinner className="spinner" />
+                      ) : (
+                        <FaTimes />
+                      )}
+                      Reject
+                    </button>
+                  )}
+                  {filter === 'REJECTED' && (
+                    <button 
+                      className="approve-btn"
+                      onClick={async () => {
+                        try {
+                          setProcessingId(req.id);
+                          await facultyAPI.approveEvent(req.id); // Call API to approve the event
+                          setRequests(requests.filter(request => request.id !== req.id)); // Remove the card from current list
+                          alert('Event approved successfully!');
+                        } catch (err) {
+                          console.error('Error approving event:', err);
+                          alert('Failed to approve event. Please try again.');
+                        } finally {
+                          setProcessingId(null);
+                        }
+                      }}
+                      disabled={processingId === req.id}
+                    >
+                      {processingId === req.id ? (
+                        <FaSpinner className="spinner" />
+                      ) : (
+                        <FaCheck />
+                      )}
+                      Approve
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="document-preview-box">
@@ -185,12 +260,74 @@ export default function Reports() {
                     src={req.imageUrl} 
                     alt="Event document" 
                     className="document-preview"
+                    style={{cursor: 'pointer'}}
+                    onClick={() => setModalImage(req.imageUrl)}
                   />
                 ) : (
                   <div className="no-document">
                     <p>No document attached</p>
                   </div>
                 )}
+      {/* Modal for viewing image */}
+      {modalImage && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.7)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+          onClick={() => setModalImage(null)}
+        >
+          <span
+            style={{
+              position: 'absolute',
+              top: '2.5%',
+              right: '3%',
+              fontSize: '1.4rem',
+              color: '#fff',
+              cursor: 'pointer',
+              zIndex: 10000,
+              fontWeight: 700,
+              userSelect: 'none',
+              background: 'rgba(0,0,0,0.25)',
+              borderRadius: '50%',
+              width: '1.8em',
+              height: '1.8em',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'background 0.18s',
+            }}
+            onClick={e => { e.stopPropagation(); setModalImage(null); }}
+            title="Close"
+          >
+            &#10005;
+          </span>
+          <img
+            src={modalImage}
+            alt="Preview"
+            style={{
+              width: 'auto',
+              height: 'auto',
+              maxWidth: '100vw',
+              maxHeight: '100vh',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+              background: '#fff',
+              padding: '1.5rem',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
               </div>
             </div>
           </div>
@@ -348,7 +485,7 @@ export default function Reports() {
           .request-box {
             max-width: 98vw;
           }
-          .request-box-inner {
+          .request-box_inner {
             padding: 1.5rem 1.2rem 1.2rem 1.2rem;
           }
           .document-preview-box {
@@ -359,7 +496,7 @@ export default function Reports() {
           }
         }
         @media (max-width: 900px) {
-          .request-box-inner {
+          .request-box_inner {
             flex-direction: column;
             padding: 1.2rem 1rem 1.2rem 1rem;
           }
@@ -441,11 +578,14 @@ export default function Reports() {
           gap: 0.3rem;
         }
         .action-buttons {
-          margin-top: 1.5rem;
+          position: absolute; /* Ensure buttons are in the corner */
+          right: 1rem; /* Align to the right edge */
+          bottom: 1rem; /* Align to the bottom edge */
           display: flex;
+          justify-content: flex-end; /* Align buttons horizontally */
           gap: 0.75rem;
         }
-        .approve-btn, .reject-btn {
+        .approve-btn, .reject-btn, .reapprove-btn {
           display: flex;
           align-items: center;
           gap: 0.4rem;
@@ -476,7 +616,16 @@ export default function Reports() {
           transform: translateY(-1px);
           box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
         }
-        .approve-btn:disabled, .reject-btn:disabled {
+        .reapprove-btn {
+          background-color: #ffc107;
+          color: #fff;
+        }
+        .reapprove-btn:hover:not(:disabled) {
+          background-color: #e0a800;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+        }
+        .approve-btn:disabled, .reject-btn:disabled, .reapprove-btn:disabled {
           opacity: 0.6;
           cursor: not-allowed;
         }
@@ -538,12 +687,84 @@ export default function Reports() {
             flex-direction: column;
             gap: 0.5rem;
           }
-          .approve-btn, .reject-btn {
+          .approve-btn, .reject-btn, .reapprove-btn {
             width: 100%;
             justify-content: center;
           }
         }
 
+        .search-bar {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 1.5rem;
+        }
+
+        .search-wrapper {
+          position: relative;
+          width: 90%;
+        }
+
+        .search-icon {
+          position: absolute;
+          top: 50%;
+          left: 16px;
+          transform: translateY(-50%);
+          color: #9ca3af;
+          font-size: 1.1rem;
+        }
+
+        .search-input {
+          width: 100%;
+          padding: 0.8rem 1.2rem 0.8rem 2.5rem;
+          border-radius: 8px;
+          border: 1px solid #d1d5db;
+          font-size: 1rem;
+          outline: none;
+          transition: 0.3s;
+        }
+
+        .search-input:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }
+
+        .reapprove-btn {
+          background-color: #ffc107;
+          color: #fff;
+          padding: 0.7rem 1.5rem;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.95rem;
+          font-weight: 600;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .reapprove-btn:hover:not(:disabled) {
+          background-color: #e0a800;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+        }
+
+        .reapprove-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .action-buttons {
+          position: absolute; /* Ensure buttons are in the corner */
+          right: 1rem; /* Align to the right edge */
+          bottom: 1rem; /* Align to the bottom edge */
+          display: flex;
+          justify-content: flex-end; /* Align buttons horizontally */
+          gap: 0.75rem;
+        }
+
+        .request-box {
+          position: relative; /* Make the card a positioning context */
+          padding-bottom: 3rem; /* Ensure space for buttons */
+        }
       `}</style>
     </div>
   );
