@@ -371,4 +371,43 @@ export const profileAPI = {
   }
 };
 
+// Faculty API - matches your FacultyController
+export const facultyAPI = {
+  // Get all pending events for faculty review
+  getPendingEvents: async () => {
+    const response = await api.get('/faculty/events/pending');
+    return response.data;
+  },
+
+  // Get pending events by type
+  getPendingEventsByType: async (type) => {
+    const response = await api.get(`/faculty/events/pending/${type}`);
+    return response.data;
+  },
+
+  // Approve an event
+  approveEvent: async (id) => {
+    const response = await api.put(`/faculty/events/${id}/approve`);
+    return response.data;
+  },
+
+  // Reject an event
+  rejectEvent: async (id) => {
+    const response = await api.put(`/faculty/events/${id}/reject`);
+    return response.data;
+  },
+
+  // Get all events with their status
+  getAllEvents: async () => {
+    const response = await api.get('/faculty/events/all');
+    return response.data;
+  },
+
+  // Get events by status
+  getEventsByStatus: async (status) => {
+    const response = await api.get(`/faculty/events/status/${status}`);
+    return response.data;
+  }
+};
+
 export default api;
