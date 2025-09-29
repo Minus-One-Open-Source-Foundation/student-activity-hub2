@@ -393,6 +393,22 @@ export default function StudentProfile() {
     }
   };
 
+  const handleTransferAccount = () => {
+    const currentEmail = info.email; // User's current email
+    const alternateEmail = prompt('Enter alternate account email:'); // Prompt user for alternate email
+
+    if (!alternateEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(alternateEmail)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    // Simulate manual transfer request
+    alert(`Manual transfer initiated from ${currentEmail} to ${alternateEmail}`);
+
+    // Replace with actual API call logic
+    console.log(`Manual transfer: Current Email - ${currentEmail}, Alternate Email - ${alternateEmail}`);
+  };
+
   return (
     <div className="profile-wrapper">
       <h2 className="title">Student Profile</h2>
@@ -512,6 +528,59 @@ export default function StudentProfile() {
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
           )}
+
+          {/* Transfer Account Button */}
+          <div className="transfer-account-wrapper" style={{ marginTop: '1.5rem' }}>
+            <h3>Transfer Account</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const destinationEmail = e.target.elements.destinationEmail.value;
+
+                if (!destinationEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(destinationEmail)) {
+                  alert('Please enter a valid email address.');
+                  return;
+                }
+
+                alert(`Manual transfer initiated from ${info.email} to ${destinationEmail}`);
+                console.log(`Manual transfer: Current Email - ${info.email}, Destination Email - ${destinationEmail}`);
+              }}
+            >
+              <div style={{ marginBottom: '1rem' }}>
+                <label htmlFor="destinationEmail" style={{ display: 'block', marginBottom: '0.5rem' }}>Destination Email:</label>
+                <input
+                  type="email"
+                  id="destinationEmail"
+                  name="destinationEmail"
+                  placeholder="Enter destination email"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem', // Increased padding for larger text field
+                    borderRadius: '8px',
+                    border: '1px solid #ddd',
+                    fontSize: '1rem', // Increased font size for better readability
+                  }}
+                />
+              </div>
+              <button
+                type="submit"
+                style={{
+                  background: "linear-gradient(90deg,#ff6a00,#ee0979)", // Matched Logout button color
+                  color: 'white',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '1rem',
+                  width: '100%',
+                  border: 'none', // Removed black outline
+                }}
+              >
+                Confirm Transfer
+              </button>
+            </form>
+          </div>
         </div>
       </div>
 
