@@ -4,6 +4,10 @@ import { useNavigate } from "react-router-dom";
 export default function FacultyDashboard() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
+  // Carousel logic
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  const [showNext, setShowNext] = useState(false);
 
   // Mock fetch (replace with API call later)
   useEffect(() => {
@@ -28,6 +32,32 @@ export default function FacultyDashboard() {
       },
     ]);
   }, []);
+
+  const placementCards = [
+    { company: "Zoho", logo: "src/assets/zoho.png" },
+    { company: "Amazon", logo: "src/assets/amazon.png" },
+    { company: "Accenture", logo: "src/assets/accenture.png" },
+    { company: "TVS", logo: "src/assets/tvs.png" },
+    { company: "TCS", logo: "src/assets/tcs.png" },
+    { company: "MRF", logo: "src/assets/mrf.png" },
+    { company: "ibm", logo: "src/assets/ibm.png" },
+    { company: "mips", logo: "src/assets/mips.png" },
+    { company: "tcs_ele", logo: "src/assets/tcs_ele.png" },
+  ];
+
+  useEffect(() => {
+    if (animating) return;
+    const interval = setInterval(() => {
+      setShowNext(true);
+      setAnimating(true);
+      setTimeout(() => {
+        setCarouselIndex((prev) => (prev + 1) % placementCards.length);
+        setShowNext(false);
+        setAnimating(false);
+      }, 400);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [animating, placementCards.length]);
 
   const handleAction = (id, action) => {
     setRequests((prev) => prev.filter((req) => req.id !== id));
@@ -60,12 +90,41 @@ export default function FacultyDashboard() {
         </div>
       </div>
 
+      {/* Current Placement Drive Section */}
+      <h2 className="placement-title">Current Placement Drive - On Campus</h2>
+      <div className="placement-container">
+        <div className="carousel-viewport">
+          <div className="carousel-stack">
+            <div className={`carousel-slide current${animating ? ' animating' : ''}`}
+              style={animating ? { transform: 'translateX(-100%)' } : { transform: 'translateX(0)' }}>
+              {placementCards.slice(carouselIndex, carouselIndex + 1).map((card, idx) => (
+                <div className="placement-card" key={idx}>
+                  <img src={card.logo} alt="Company Logo" className="company-logo" />
+                  <div className="company-name">{card.company}</div>
+                </div>
+              ))}
+            </div>
+            {showNext && (
+              <div className="carousel-slide next animating"
+                style={{ transform: animating ? 'translateX(0)' : 'translateX(100%)' }}>
+                {placementCards.slice((carouselIndex + 1) % placementCards.length, (carouselIndex + 2) % placementCards.length).map((card, idx) => (
+                  <div className="placement-card" key={idx}>
+                    <img src={card.logo} alt="Company Logo" className="company-logo" />
+                    <div className="company-name">{card.company}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Requests Section */}
       <div className="dashboard-wrapper">
         <style>{`
           .faculty-dashboard {
-            height: 100vh;
-            overflow: hidden;
+            min-height: 120vh;
+            overflow-y: auto;
             padding: 2rem;
             font-family: 'Inter', sans-serif;
             background: url("/src/assets/bg.jpg") no-repeat center center fixed;
@@ -139,10 +198,96 @@ export default function FacultyDashboard() {
             color: #374151;
           }
 
+          /* Current Placement Drive Section */
+          .placement-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+          }
+          .placement-container {
+            width: 1000px;
+            max-width: 100%;
+            margin: 0 auto 2.5rem auto;
+            background: rgba(200, 200, 200, 0.35); /* glassy grey */
+            backdrop-filter: blur(16px);
+            border-radius: 18px;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 1.5px 8px 0 rgba(255,255,255,0.25) inset;
+            padding: 2.5rem 2.5rem;
+            min-height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .carousel-viewport {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .carousel-stack {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .carousel-slide {
+            display: flex;
+            gap: 1.5rem;
+            width: 80%;
+            min-width: 0;
+            position: absolute;
+            top: -6%;
+            left: 12%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+            justify-content: center;
+          }
+          .carousel-slide.next.animating {
+            z-index: 2;
+          }
+          .carousel-slide.current.animating {
+            z-index: 1;
+          }
+          .placement-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 2.5rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            transition: box-shadow 0.3s;
+          }
+          .placement-card .company-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 1.2rem;
+            margin-top: -24px;
+          }
+          .placement-card .company-name {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1.5rem;
+            text-align: center;
+          }
+
           /* Requests Section */
           .dashboard-wrapper {
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow: visible;
             padding: 2rem;
             font-family: 'Inter', sans-serif;
             background: url("/src/assets/bg.jpg") no-repeat center center fixed;
