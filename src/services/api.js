@@ -78,7 +78,7 @@ export const authAPI = {
       username: name,  // Your DTO expects 'username', not 'name'
       email, 
       password,
-      role: "STUDENT"  // Your DTO requires a 'role' field
+      role: "STUDENT"  // All registrations are for students, faculty added via database
     };
     console.log('Sending registration request:', requestData); // Debug log
     

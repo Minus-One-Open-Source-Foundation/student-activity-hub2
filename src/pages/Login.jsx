@@ -37,9 +37,17 @@ export default function Login() {
     setFeedback(null);
 
     try {
-      await login(form.email, form.password);
+      const userData = await login(form.email, form.password);
       setFeedback({ text: "Login successful — redirecting...", type: "success" });
-      setTimeout(() => navigate("/"), 900);
+      
+      // Role-based redirection
+      setTimeout(() => {
+        if (userData?.role === "FACULTY" || userData?.role === "faculty") {
+          navigate("/faculty");
+        } else {
+          navigate("/");
+        }
+      }, 900);
     } catch (error) {
       setFeedback({ 
         text: error.response?.data?.message || error.message || "Login failed. Please check your credentials.", 
@@ -54,7 +62,7 @@ export default function Login() {
     <div className="auth-wrapper">
       <form className="auth-card animate-card" onSubmit={handleSubmit} autoComplete="off" noValidate>
         <h1 className="title animate-fade-in">Welcome Back</h1>
-        <p className="subtitle">Sign in to access your student dashboard</p>
+        <p className="subtitle">Sign in to access your dashboard</p>
 
         <label className="label">Email</label>
         <input

@@ -80,7 +80,7 @@ export default function Register() {
   return (
     <div className="auth-wrapper">
       <form className="auth-card" onSubmit={handleSubmit} noValidate>
-        <h1 className="title">Create Account</h1>
+        <h1 className="title">Create Student Account</h1>
         <p className="subtitle">Register to manage your student activity portfolio</p>
 
         <label className="label">Full Name</label>

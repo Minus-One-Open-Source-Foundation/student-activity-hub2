@@ -29,11 +29,14 @@ export function AuthProvider({ children }) {
       const response = await authAPI.login(email, password);
       
       if (response.success) {
-        // Store token and user data
+        // Store token and user data with role information
         localStorage.setItem('token', response.token);
-        localStorage.setItem('userData', JSON.stringify(response.user || { email }));
-        setUser(response.user || { email });
-        return true;
+        const userData = response.user || { email };
+        localStorage.setItem('userData', JSON.stringify(userData));
+        setUser(userData);
+        
+        // Return user data for role-based redirection
+        return userData;
       } else {
         throw new Error(response.message || 'Login failed');
       }
