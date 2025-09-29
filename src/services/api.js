@@ -407,6 +407,56 @@ export const facultyAPI = {
   getEventsByStatus: async (status) => {
     const response = await api.get(`/faculty/events/status/${status}`);
     return response.data;
+  },
+
+  // Internship management endpoints for faculty
+  // Get all pending internships for faculty review
+  getPendingInternships: async () => {
+    const response = await api.get('/faculty/internships/pending');
+    return response.data;
+  },
+
+  // Get all internships with their status
+  getAllInternships: async () => {
+    const response = await api.get('/faculty/internships/all');
+    return response.data;
+  },
+
+  // Approve an internship
+  approveInternship: async (id) => {
+    const response = await api.put(`/faculty/internships/${id}/approve`);
+    return response.data;
+  },
+
+  // Reject an internship
+  rejectInternship: async (id) => {
+    const response = await api.put(`/faculty/internships/${id}/reject`);
+    return response.data;
+  }
+};
+
+// Internship API - matches your InternshipController
+export const internshipAPI = {
+  // Create a new internship
+  createInternship: async (formData) => {
+    const response = await api.post('/internships/create', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Get user internships
+  getUserInternships: async (userEmail) => {
+    const response = await api.get(`/internships/user/${encodeURIComponent(userEmail)}`);
+    return response.data;
+  },
+
+  // Get internship by ID
+  getInternshipById: async (id, userEmail) => {
+    const response = await api.get(`/internships/${id}/user/${encodeURIComponent(userEmail)}`);
+    return response.data;
   }
 };
 

@@ -1,67 +1,126 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaPlus,
   FaCheckCircle,
   FaExclamationCircle,
   FaFileAlt,
+  FaSpinner,
 } from "react-icons/fa";
+import { internshipAPI } from "../services/api";
 
 export default function Internships() {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Summer Internship at XYZ Corp",
-      type: "Internship",
-      startDate: "2025-05-01",
-      endDate: "2025-06-01",
-      companyName: "XYZ Corp",
-      description:
-        "Worked on developing web applications using React and Node.js.",
-      file: { name: "certificate.jpg", type: "JPG" },
-      status: "Approved",
-    },
-    {
-      id: 2,
-      title: "Winter Internship at ABC Ltd",
-      type: "Internship",
-      startDate: "2025-11-15",
-      endDate: "2025-12-15",
-      companyName: "ABC Ltd",
-      description: "Contributed to backend services and database optimization.",
-      file: { name: "certificate.jpg", type: "JPG" },
-      status: "Pending",
-    },
-  ]);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
-    type: "Internship",
     startDate: "",
     endDate: "",
     companyName: "",
     description: "",
-    file: null,
-    status: "Pending",
+    mode: "",
+    certificate: null,
   });
 
-  const handleAddInternship = () => {
-    setEvents([...events, { id: events.length + 1, ...formData }]);
-    setShowForm(false);
-    setFormData({
-      title: "",
-      type: "Internship",
-      startDate: "",
-      endDate: "",
-      companyName: "",
-      description: "",
-      file: null,
-      status: "Pending",
-    });
+  // Get user email from localStorage
+  const getUserEmail = () => {
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+      const user = JSON.parse(userData);
+      return user.email;
+    }
+    return null;
+  };
+
+  // Fetch user internships on component mount
+  useEffect(() => {
+    fetchUserInternships();
+  }, []);
+
+  const fetchUserInternships = async () => {
+    try {
+      setLoading(true);
+      const userEmail = getUserEmail();
+      if (!userEmail) {
+        setError('Please log in to view your internships');
+        return;
+      }
+
+      const internships = await internshipAPI.getUserInternships(userEmail);
+      setEvents(internships);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching internships:', err);
+      setError('Failed to load internships. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddInternship = async () => {
+    try {
+      setSubmitting(true);
+      const userEmail = getUserEmail();
+      if (!userEmail) {
+        alert('Please log in to submit an internship');
+        return;
+      }
+
+      // Validate form data
+      if (!formData.title || !formData.companyName || !formData.startDate || !formData.endDate || !formData.mode) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      // Create FormData for file upload
+      const submitData = new FormData();
+      submitData.append('title', formData.title);
+      submitData.append('companyName', formData.companyName);
+      submitData.append('mode', formData.mode);
+      submitData.append('startDate', formData.startDate);
+      submitData.append('endDate', formData.endDate);
+      submitData.append('description', formData.description);
+      submitData.append('userEmail', userEmail);
+      
+      if (formData.certificate) {
+        submitData.append('certificate', formData.certificate);
+      }
+
+      // Submit to backend
+      const response = await internshipAPI.createInternship(submitData);
+      
+      if (response.success) {
+        // Refresh the internships list
+        await fetchUserInternships();
+        setShowForm(false);
+        setFormData({
+          title: "",
+          startDate: "",
+          endDate: "",
+          companyName: "",
+          description: "",
+          mode: "",
+          certificate: null,
+        });
+        alert('Internship submitted successfully!');
+      } else {
+        alert(response.message || 'Failed to submit internship');
+      }
+    } catch (err) {
+      console.error('Error submitting internship:', err);
+      alert('Failed to submit internship. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const filteredEvents = events.filter((ev) =>
-    ev.title.toLowerCase().includes(formData.title.toLowerCase())
+    ev.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ev.companyName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -87,10 +146,8 @@ export default function Internships() {
           <input
             type="text"
             placeholder="Search internships..."
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="search-bar"
             style={{
               flex: 1,
@@ -219,8 +276,9 @@ export default function Internships() {
               <option value="" disabled>
                 Select Internship Mode
               </option>
-              <option value="Online">Online Internship</option>
-              <option value="Offline">Offline Internship</option>
+              <option value="REMOTE">Remote</option>
+              <option value="ONSITE">On-site</option>
+              <option value="HYBRID">Hybrid</option>
             </select>
             <label style={{ fontWeight: 500, marginBottom: "0.1rem", marginLeft: "8px" }}>
               Start Date
@@ -281,8 +339,9 @@ export default function Internships() {
             />
             <input
               type="file"
+              accept="image/*,application/pdf"
               onChange={(e) =>
-                setFormData({ ...formData, file: e.target.files[0] })
+                setFormData({ ...formData, certificate: e.target.files[0] })
               }
               style={{
                 width: "100%",
@@ -302,18 +361,23 @@ export default function Internships() {
             >
               <button
                 onClick={handleAddInternship}
+                disabled={submitting}
                 style={{
                   padding: "0.8rem 1.5rem",
-                  background: "linear-gradient(90deg,#ff6a00,#ee0979)",
+                  background: submitting ? "#ccc" : "linear-gradient(90deg,#ff6a00,#ee0979)",
                   color: "#fff",
                   fontWeight: 600,
                   fontSize: "1rem",
                   border: "none",
                   borderRadius: "8px",
-                  cursor: "pointer",
+                  cursor: submitting ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
                 }}
               >
-                Submit
+                {submitting && <FaSpinner className="spinner" />}
+                {submitting ? "Submitting..." : "Submit"}
               </button>
               <button
                 onClick={() => setShowForm(false)}
@@ -335,137 +399,194 @@ export default function Internships() {
         </div>
       )}
 
+      {/* Loading State */}
+      {loading && (
+        <div style={{ textAlign: "center", padding: "3rem" }}>
+          <FaSpinner className="spinner" style={{ fontSize: "2rem", color: "#007bff" }} />
+          <p>Loading your internships...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div style={{ textAlign: "center", padding: "3rem", background: "rgba(255,255,255,0.9)", borderRadius: "8px", margin: "2rem auto", maxWidth: "500px" }}>
+          <p style={{ color: "#dc3545", fontSize: "1.1rem", marginBottom: "1rem" }}>{error}</p>
+          <button onClick={fetchUserInternships} style={{ padding: "0.5rem 1rem", background: "#007bff", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* No Internships State */}
+      {!loading && !error && filteredEvents.length === 0 && (
+        <div style={{ textAlign: "center", padding: "3rem", background: "rgba(255,255,255,0.9)", borderRadius: "8px", margin: "2rem auto", maxWidth: "500px" }}>
+          <p>No internships found. Click "Add internships" to create your first internship entry.</p>
+        </div>
+      )}
+
       {/* Cards */}
-      <section
-        className="cards-container"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "2rem",
-        }}
-      >
-        {filteredEvents.map((event) => (
-          <div
-            key={event.id}
-            className="event-card"
-            style={{
-              background: "#fff",
-              borderRadius: "18px",
-              boxShadow: "0 6px 24px rgba(0,0,0,0.13)",
-              padding: "2rem 1.6rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "1rem",
-            }}
-          >
-            <div
-              className={`badge ${event.type.toLowerCase()}`}
-              style={{
-                position: "absolute",
-                top: "1.2rem",
-                left: "1.2rem",
-                padding: "0.4rem 1.2rem",
-                borderRadius: "14px",
-                fontWeight: 700,
-                fontSize: "1rem",
-                background: "#fff",
-                border: "2px solid #ff6a00",
-                color: "#ff6a00",
-              }}
-            >
-              {event.type}
-            </div>
-            <div
-              className="event-main"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "flex-start",
-                gap: "2rem",
-              }}
-            >
-              <div className="event-info" style={{ flex: 1 }}>
-                <h3
-                  className="event-title"
+      {!loading && !error && filteredEvents.length > 0 && (
+        <section
+          className="cards-container"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "2rem",
+          }}
+        >
+            {filteredEvents.map((event) => (
+              <div
+                key={event.id}
+                className="event-card"
+                style={{
+                  background: "#fff",
+                  borderRadius: "18px",
+                  boxShadow: "0 6px 24px rgba(0,0,0,0.13)",
+                  padding: "2rem 1.6rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                  position: "relative",
+                }}
+              >
+                <div
+                  className="badge internship"
                   style={{
-                    color: "#3a3aee",
-                    fontSize: "1.1rem",
+                    position: "absolute",
+                    top: "1.2rem",
+                    left: "1.2rem",
+                    padding: "0.4rem 1.2rem",
+                    borderRadius: "14px",
                     fontWeight: 700,
-                    margin: "0.5rem 0",
-                  }}
-                >
-                  {event.type}
-                </h3>
-                <h4
-                  className="event-subtitle"
-                  style={{
-                    color: "#3a3aee",
                     fontSize: "1rem",
-                    fontWeight: 600,
-                    margin: "0.3rem 0 0.5rem 0",
+                    background: "#fff",
+                    border: "2px solid #ff6a00",
+                    color: "#ff6a00",
                   }}
                 >
-                  {event.title}
-                </h4>
-                <span
-                  className="company-name"
+                  Internship
+                </div>
+                <div
+                  className="event-main"
                   style={{
-                    fontSize: "1rem",
-                    color: "#555",
-                    fontWeight: 600,
-                    marginBottom: "0.5rem",
-                    display: "block",
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "flex-start",
+                    gap: "2rem",
+                    marginTop: "1rem", // Add space to avoid badge collision
                   }}
                 >
-                  {event.companyName}
-                </span>
-                <span
-                  className="date"
-                  style={{
-                    fontSize: "0.95rem",
-                    color: "#777",
-                    marginBottom: "0.7rem",
-                    display: "block",
-                  }}
-                >
-                  {event.startDate} - {event.endDate}
-                </span>
-                  {/* Internship mode below date */}
-                  <div style={{ fontSize: '1rem', color: '#3a3aee', fontWeight: 600, marginBottom: '0.7rem', textAlign: 'left' }}>
-                    Internship mode: <span style={{ color: '#222', fontWeight: 500 }}>{event.mode || 'Remote'}</span>
+                  <div className="event-info" style={{ flex: 1 }}>
+                    <h3
+                      className="event-title"
+                      style={{
+                        color: "#3a3aee",
+                        fontSize: "1.1rem",
+                        fontWeight: 700,
+                        margin: "1rem 0 0.5rem 0", // Add top margin to avoid badge overlap
+                      }}
+                    >
+                      {event.title}
+                    </h3>
+                    <span
+                      className="company-name"
+                      style={{
+                        fontSize: "1rem",
+                        color: "#555",
+                        fontWeight: 600,
+                        marginBottom: "0.5rem",
+                        display: "block",
+                      }}
+                    >
+                      {event.companyName}
+                    </span>
+                    <span
+                      className="date"
+                      style={{
+                        fontSize: "0.95rem",
+                        color: "#777",
+                        marginBottom: "0.7rem",
+                        display: "block",
+                      }}
+                    >
+                      {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
+                    </span>
+                    <div style={{ fontSize: '1rem', color: '#3a3aee', fontWeight: 600, marginBottom: '0.7rem', textAlign: 'left' }}>
+                      Internship mode: <span style={{ color: '#222', fontWeight: 500 }}>{event.mode || 'REMOTE'}</span>
+                    </div>
+                    <p
+                      style={{
+                        color: "#444",
+                        fontSize: "1rem",
+                        marginBottom: "0.7rem",
+                      }}
+                    >
+                      {event.description}
+                    </p>
                   </div>
-                <p
-                  style={{
-                    color: "#444",
-                    fontSize: "1rem",
-                    marginBottom: "0.7rem",
-                  }}
-                >
-                  {event.description}
-                </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    {/* Document preview box */}
+                    <div style={{ 
+                      width: '180px', 
+                      height: '160px', 
+                      minWidth: '180px', 
+                      minHeight: '160px', 
+                      border: '2px dashed #bbb', 
+                      borderRadius: '12px', 
+                      background: '#fff', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}>
+                      {event.certificateUrl ? (
+                        <img 
+                          src={event.certificateUrl} 
+                          alt="Certificate" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div style={{ textAlign: 'center', color: '#666', fontSize: '0.9rem' }}>
+                          <FaFileAlt style={{ fontSize: '2rem', marginBottom: '0.5rem' }} />
+                          <br />No certificate
+                        </div>
+                      )}
+                    </div>
+                    {/* Status below the rectangle box */}
+                    <div style={{ marginTop: '0.7rem', textAlign: 'center' }}>
+                      {event.status === "APPROVED" ? (
+                        <span style={{ color: '#4CAF50', fontWeight: 'bold', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#e8f5e9', borderRadius: '8px', padding: '0.3rem 0.8rem', border: '1.5px solid #4CAF50' }}>
+                          <FaCheckCircle style={{ marginRight: '4px' }} /> Approved
+                        </span>
+                      ) : event.status === "REJECTED" ? (
+                        <span style={{ color: '#f44336', fontWeight: 'bold', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#ffebee', borderRadius: '8px', padding: '0.3rem 0.8rem', border: '1.5px solid #f44336' }}>
+                          <FaExclamationCircle style={{ marginRight: '4px' }} /> Rejected
+                        </span>
+                      ) : (
+                        <span style={{ color: '#FF9800', fontWeight: 'bold', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#fff8e1', borderRadius: '8px', padding: '0.3rem 0.8rem', border: '1.5px solid #FF9800' }}>
+                          <FaExclamationCircle style={{ marginRight: '4px' }} /> Pending
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-              {/* Empty rectangle box */}
-              <div style={{ width: '180px', height: '160px', minWidth: '180px', minHeight: '160px', border: '2px dashed #bbb', borderRadius: '12px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}></div>
-              {/* Status below the rectangle box, outside and down */}
-              <div style={{ width: '180px', marginLeft: 'auto', marginTop: '0.7rem', textAlign: 'center' }}>
-                {event.status === "Approved" ? (
-                  <span style={{ color: '#4CAF50', fontWeight: 'bold', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#e8f5e9', borderRadius: '8px', padding: '0.3rem 0.8rem', border: '1.5px solid #4CAF50' }}>
-                    <FaCheckCircle style={{ marginRight: '4px' }} /> Approved
-                  </span>
-                ) : (
-                  <span style={{ color: '#FF9800', fontWeight: 'bold', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#fff8e1', borderRadius: '8px', padding: '0.3rem 0.8rem', border: '1.5px solid #FF9800' }}>
-                    <FaExclamationCircle style={{ marginRight: '4px' }} /> Pending
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </section>
+            ))}
+          </section>
+        )
+      }
 
       <style>{`
         .approved { color: #10b981; }
         .pending { color: #ff4b5c; }
+        .spinner {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
       `}</style>
     </div>
   );
