@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [personalInfo] = useState({
     name: "John Doe",
@@ -11,14 +14,11 @@ export default function Dashboard() {
     address: "123, College Street",
   });
 
-  const [activities, setActivities] = useState([
+  const [activities] = useState([
     { id: 1, title: "Hackathon", description: "Participated in SIH Hackathon", category: "Hackathon", status: "Approved" },
     { id: 2, title: "Workshop", description: "Attended AI Workshop", category: "Workshop", status: "Pending" },
     { id: 3, title: "Internship", description: "Summer internship at Infosys", category: "Internship", status: "Approved" },
   ]);
-
-  const [newActivity, setNewActivity] = useState({ title: "", description: "", category: "", file: null });
-  const [showForm, setShowForm] = useState(false);
 
   const hackathonWorkshops = activities.filter(
     (a) => a.category === "Hackathon" || a.category === "Workshop"
@@ -27,18 +27,6 @@ export default function Dashboard() {
   const internships = activities.filter((a) => a.category === "Internship").length;
 
   const achievements = activities.filter((a) => a.status === "Approved").length;
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!newActivity.title || !newActivity.description || !newActivity.category) {
-      alert("Please fill all fields.");
-      return;
-    }
-    const activity = { id: activities.length + 1, ...newActivity, status: "Pending" };
-    setActivities([...activities, activity]);
-    setNewActivity({ title: "", description: "", category: "", file: null });
-    setShowForm(false);
-  };
 
   const handleDownloadPortfolio = () => {
     let content = `Student Portfolio\n\n`;
@@ -54,6 +42,43 @@ export default function Dashboard() {
     link.click();
   };
 
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("Professional Portfolio", 105, 20, { align: "center" });
+
+    // Add student details dynamically
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Name: ${user?.name || "N/A"}`, 20, 40);
+    doc.text(`Email: ${user?.email || "N/A"}`, 20, 50);
+    doc.text(`Phone: ${user?.phone || "N/A"}`, 20, 60);
+
+    // Add sections (example placeholders)
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Achievements", 20, 80);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    activities.filter(a => a.status === "Approved").forEach((achievement, index) => {
+      doc.text(`- ${achievement.title}`, 20, 90 + (index * 10));
+    });
+
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Academic Records", 20, 120);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text("- B.Tech in Computer Science, XYZ University", 20, 130);
+    doc.text("- GPA: 9.2/10", 20, 140);
+
+    // Save the PDF
+    doc.save("Portfolio.pdf");
+  };
+
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-content">
@@ -63,91 +88,77 @@ export default function Dashboard() {
         {/* Stats Section */}
         <section className="stats-section">
         <div className="stats-grid">
-        {/* Academic Records Card */}
+        {/* Personal Info Card */}
+          <div
+            className="glass-card"
+            onClick={() => navigate("/personal-info")}
+            style={{ cursor: "pointer" }}
+            >
+            <h3>Personal Info</h3>
+            <p className="description">View and update your personal details.</p>
+          </div>
+
+          {/* Co-Curricular Card */}
+          <div
+            className="glass-card"
+            onClick={() => navigate("/activities")}
+            style={{ cursor: "pointer" }}
+            >
+            <h3>Co-Curricular</h3>
+            <p className="description">Track your co-curricular activities and achievements.</p>
+          </div>
+
+          {/* URMS Card */}
+          <div
+            className="glass-card"
+            onClick={() => navigate("/portfolio")}
+            style={{ cursor: "pointer" }}
+            >
+            <h3>URMS</h3>
+            <p className="description">Access your unified resource management system.</p>
+          </div>
+
+          {/* Academic Records Card */}
           <div
             className="glass-card"
             onClick={() => navigate("/academic-records")}
             style={{ cursor: "pointer" }}
             >
             <h3>Academic Records</h3>
-            <p className="stat-value">—</p>
+            <p className="description">View your academic performance and records.</p>
           </div>
 
           <div className="glass-card" onClick={() => navigate("/hackathons-workshops")} style={{ cursor: "pointer" }}>
             <h3>Hackathons & Workshops</h3>
-            <p className="stat-value">{hackathonWorkshops}</p>
+            <p className="description">Explore your participation in hackathons and workshops.</p>
           </div>
 
           <div className="glass-card" onClick={() => navigate("/internships")} style={{ cursor: "pointer" }}>
             <h3>Internships</h3>
-            <p className="stat-value">{internships}</p>
+            <p className="description">Manage and track your internship experiences.</p>
           </div>
 
-          <div className="glass-card">
+          <div className="glass-card" onClick={() => navigate("/achievements")} style={{ cursor: "pointer" }}>
             <h3>Approved Achievements</h3>
-            <p className="stat-value">{achievements}</p>
+            <p className="description">Review your approved achievements and milestones.</p>
           </div>
-        </div>
-      </section>
 
-        {/* Activity Section */}
-        <section className="activity-section">
-        <div className="activity-header">
-          <h2>Activity Overview</h2>
-          <button className="primary-btn" onClick={() => setShowForm(true)}>Add Activity</button>
-        </div>
-
-        <div className="activities-list">
-          <ul>
-            {activities.slice().reverse().map((a) => (
-              <li key={a.id} className="activity-item">
-                <strong>{a.title}</strong> ({a.category})<br />
-                <small>{a.description}</small><br />
-                {a.file && <small>📎 {a.file.name}</small>}
-                <span className={`status ${a.status.toLowerCase()}`}>{a.status}</span>
-              </li>
-            ))}
-          </ul>
+          {/* Analytics Card */}
+          <div
+            className="glass-card"
+            onClick={() => navigate("/analytics")}
+            style={{ cursor: "pointer" }}
+            >
+            <h3>Analytics</h3>
+            <p className="description">Analyze your performance and progress over time.</p>
+          </div>
         </div>
       </section>
 
         {/* Download Button */}
         <div className="download-btn">
-        <button className="primary-btn" onClick={handleDownloadPortfolio}>Download Portfolio</button>
+        <button className="primary-btn" onClick={generatePDF}>Download Portfolio</button>
       </div>
-
-        {/* Modal for Adding Activity */}
-        {showForm && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-            <h3>Add New Activity</h3>
-            <form onSubmit={handleSubmit}>
-              <label>Title:
-                <input type="text" value={newActivity.title} onChange={e => setNewActivity({...newActivity, title:e.target.value})} required />
-              </label>
-              <label>Description:
-                <textarea value={newActivity.description} onChange={e => setNewActivity({...newActivity, description:e.target.value})} required />
-              </label>
-              <label>Category:
-                <select value={newActivity.category} onChange={e => setNewActivity({...newActivity, category:e.target.value})} required>
-                  <option value="">Select</option>
-                  <option value="Hackathon">Hackathon</option>
-                  <option value="Workshop">Workshop</option>
-                  <option value="Internship">Internship</option>
-                  <option value="Certification">Certification</option>
-                </select>
-              </label>
-              <label>Upload Proof:
-                <input type="file" onChange={e => setNewActivity({...newActivity, file:e.target.files[0]})} />
-              </label>
-              <div className="modal-buttons">
-                <button type="submit" className="primary-btn">Submit</button>
-                <button type="button" className="ghost-btn" onClick={() => setShowForm(false)}>Cancel</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Inline Styles */}
       <style>{`
@@ -176,59 +187,65 @@ export default function Dashboard() {
           width: 100%;
           max-width: 1200px;
           margin: 0 auto;
-          padding: 9rem 1.5rem 1rem;
+          padding: 4rem 1.5rem 1rem; /* Further adjusted padding to move content even more upwards */
           display: flex;
           flex-direction: column;
           align-items: center;
         }
         .title{ font-size:2rem; margin:0 0 0.3rem; font-weight:700; color:#111; }
+        .title span {
+          color: #001f3f; /* Updated the color of the welcome message to navy blue */
+        }
         .subtitle{ font-size:1rem; margin:0 0 1.5rem; color:rgba(0,0,0,0.7); }
 
         .stats-section{ width:100%; max-width:920px; margin-bottom:1.5rem; }
         .stats-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
 
         .glass-card{
-          background: linear-gradient(to right, #6366f1, #8b5cf6, #6366f1);
-          color: #fff;
+          background: linear-gradient(145deg, rgba(128, 90, 213, 0.4), rgba(128, 90, 213, 0.2)); /* Light purple glassy gradient */
+          color: #fff; /* Ensure text is readable */
           border-radius: 12px;
           padding: 1.3rem;
-          text-align:center;
-          box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+          text-align: center;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+          backdrop-filter: blur(10px); /* Glassy effect */
           transition: transform 0.18s, box-shadow 0.18s;
         }
         .glass-card:hover{
           transform: translateY(-6px);
           box-shadow: 0 18px 40px rgba(0,0,0,0.25);
         }
-        .glass-card h3{ margin:0 0 0.4rem 0; font-size:1rem; font-weight:700; }
-        .stat-value{ font-size:1.8rem; font-weight:700; color:#facc15; margin:0; }
-
-        .activity-section{ width:100%; max-width:920px; text-align:left; margin-bottom:1rem; }
-        .activity-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; flex-wrap:wrap; }
-        .activities-list{ background:var(--card-bg); border-radius:12px; padding:1rem; max-height:250px; overflow-y:auto; box-shadow:0 4px 15px rgba(0,0,0,0.08); }
-        .activities-list ul{ list-style:none; padding:0; margin:0; }
-        .activity-item{ background:#eaeaea; padding:0.7rem; margin-bottom:0.5rem; border-radius:8px; position:relative; }
-        .activity-item small{ color:#333; }
-
-        .status{ position:absolute; top:0.5rem; right:0.6rem; padding:0.15rem 0.6rem; border-radius:6px; font-size:0.75rem; font-weight:600; color:#fff; }
-        .status.approved{ background:#16a34a; }
-        .status.pending{ background:#f59e0b; }
-        .status.rejected{ background:#dc2626; }
-
-        .primary-btn{ background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); border:none; padding:0.65rem 1rem; border-radius:12px; color:#fff; font-weight:700; cursor:pointer; font-size:1rem; box-shadow:0 6px 20px rgba(238,9,121,0.14); transition: transform .12s; }
-        .primary-btn:hover{ transform:translateY(-2px); }
-        .ghost-btn{ background:transparent; color:#111; border:none; text-decoration:underline; cursor:pointer; font-weight:600; margin-left:0.5rem; }
-
-        .download-btn{ margin-top:0.5rem; text-align:center; margin-bottom:0; } /* removed bottom white space */
-        .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.3); display:flex; justify-content:center; align-items:center; padding:1rem; }
-        .modal-content{ background:var(--card-bg); border-radius:16px; padding:1.5rem; width:100%; max-width:380px; text-align:left; }
-        .modal-content h3{ margin-top:0; color:#111; }
-        .modal-content label{ display:block; margin:0.5rem 0 0.25rem; font-weight:600; color:#111; }
-        .modal-content input, .modal-content textarea, .modal-content select{
-          width:100%; padding:0.6rem 0.8rem; border-radius:10px; border:1px solid #ccc; background:var(--input-bg); color:#111; margin-bottom:0.7rem; outline:none;
+        .glass-card h3{ margin:0 0 0.4rem 0; font-size:1.3rem; font-weight:700; color:#facc15; }
+        .glass-card h3 {
+          color: #001f3f; /* Updated heading color to navy blue */
         }
-        .modal-content select option { color: #111; background: #fff; }
-        .modal-buttons{ display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem; }
+        .description{ font-size:0.9rem; color:#f4f4f4; margin:0.5rem 0 0; }
+        .description {
+          color: #000; /* Changed description text to black */
+        }
+
+        .download-btn button {
+          background: linear-gradient(to right, #ee0979, #ff6a00); /* Updated to match logout button color */
+          color: #fff;
+          border: none;
+          padding: 15px 25px;
+          border-radius: 15px;
+          cursor: pointer;
+          font-weight: 700;
+          font-size: 1.1rem;
+          box-shadow: 0 10px 30px rgba(238,9,121,0.3);
+          transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .download-btn button:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 15px 40px rgba(238,9,121,0.4);
+        }
+
+        .download-btn button:active {
+          transform: translateY(1px);
+          box-shadow: 0 8px 20px rgba(238,9,121,0.2);
+        }
 
         @media (max-width:520px){ .stats-grid{ grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); } }
       `}</style>
