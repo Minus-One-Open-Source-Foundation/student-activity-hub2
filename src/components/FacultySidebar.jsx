@@ -27,7 +27,8 @@ export default function FacultySidebar({ open = false, onClose }) {
   const navItems = [
     { to: "/faculty", label: "Dashboard" },
     { to: "/faculty/reports", label: "Hackathons And Workshops Requests" },
-  { to: "/faculty/extra-activities", label: "Co-curriculars" }, // Updated label
+    { to: "/faculty/internships-requests", label: "Internships Requests" },
+    { to: "/faculty/extra-activities", label: "Co-curriculars Requests" },
     { to: "/faculty/students", label: "Student Management" },
     { to: "/faculty/grades", label: "Grade Management" },
   ];
