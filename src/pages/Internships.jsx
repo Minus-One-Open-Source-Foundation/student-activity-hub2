@@ -76,7 +76,13 @@ export default function Internships() {
       }}
     >
       {/* Header */}
-      <header style={{ textAlign: "center", marginBottom: "2.5rem" }}>
+      <header
+        style={{
+          textAlign: "center",
+          marginBottom: "2.5rem",
+          marginTop: "2.5rem",
+        }}
+      >
         <div className="search-bar-wrapper">
           <input
             type="text"
@@ -91,10 +97,11 @@ export default function Internships() {
               padding: "1rem 3rem 1rem 1.5rem",
               borderRadius: "30px",
               border: "none",
-              background: "linear-gradient(90deg,#a18cd1,#fbc2eb)",
-              color: "#fff",
+              background: "rgba(255,255,255,0.7)",
+              color: "#232526",
               fontSize: "1.1rem",
               outline: "none",
+              width: "580px",
             }}
           />
           <button
@@ -124,7 +131,7 @@ export default function Internships() {
           className="modal-overlay"
           style={{
             position: "fixed",
-            top: 0,
+            top: "32px",
             left: 0,
             width: "100%",
             height: "100%",
@@ -141,12 +148,19 @@ export default function Internships() {
               width: "70%",
               maxWidth: "350px",
               background: "#fff",
-              padding: "1rem",
+              padding: "1.2rem 1.2rem",
               borderRadius: "12px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
               display: "flex",
               flexDirection: "column",
-              gap: "1rem",
+              gap: "1.1rem",
+              maxHeight: "92vh",
+              overflowY: "auto",
+              position: "fixed",
+              top: "60px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 1100,
             }}
           >
             <h3
@@ -182,58 +196,89 @@ export default function Internships() {
                 setFormData({ ...formData, companyName: e.target.value })
               }
               style={{
-                width: "100%",
-                padding: "0.8rem",
-                border: "1px solid #ddd",
                 borderRadius: "8px",
+                padding: "0.7rem 1rem",
                 fontSize: "1rem",
+                border: "1px solid #ccc",
+                outline: "none",
+                width: "100%",
               }}
             />
+            <select
+              value={formData.mode || ""}
+              onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
+              style={{
+                borderRadius: "8px",
+                padding: "0.7rem 1rem",
+                fontSize: "1rem",
+                border: "1px solid #ccc",
+                outline: "none",
+                width: "100%",
+              }}
+            >
+              <option value="" disabled>
+                Select Internship Mode
+              </option>
+              <option value="Online">Online Internship</option>
+              <option value="Offline">Offline Internship</option>
+            </select>
+            <label style={{ fontWeight: 500, marginBottom: "0.1rem", marginLeft: "8px" }}>
+              Start Date
+            </label>
             <input
               type="date"
-              placeholder="Start Date"
+              placeholder="dd-mm-yyyy"
               value={formData.startDate}
               onChange={(e) =>
                 setFormData({ ...formData, startDate: e.target.value })
               }
               style={{
-                width: "100%",
-                padding: "0.8rem",
-                border: "1px solid #ddd",
                 borderRadius: "8px",
+                padding: "0.7rem 1rem",
                 fontSize: "1rem",
+                border: "1px solid #ccc",
+                outline: "none",
+                width: "100%",
               }}
             />
+            <label style={{ fontWeight: 500, marginBottom: "0.1rem", marginLeft: "8px" }}>
+              End Date
+            </label>
             <input
               type="date"
-              placeholder="End Date"
+              placeholder="dd-mm-yyyy"
               value={formData.endDate}
               onChange={(e) =>
                 setFormData({ ...formData, endDate: e.target.value })
               }
               style={{
-                width: "100%",
-                padding: "0.8rem",
-                border: "1px solid #ddd",
                 borderRadius: "8px",
+                padding: "0.7rem 1rem",
                 fontSize: "1rem",
+                border: "1px solid #ccc",
+                outline: "none",
+                width: "100%",
               }}
             />
             <textarea
               placeholder="Description"
               value={formData.description}
+              maxLength={100}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
               style={{
-                width: "100%",
-                padding: "0.8rem",
-                border: "1px solid #ddd",
+                minHeight: "80px",
+                maxHeight: "80px",
+                resize: "none",
                 borderRadius: "8px",
+                padding: "0.7rem 1rem",
                 fontSize: "1rem",
-                minHeight: "100px",
+                border: "1px solid #ccc",
+                outline: "none",
+                width: "100%",
               }}
-            ></textarea>
+            />
             <input
               type="file"
               onChange={(e) =>
@@ -395,48 +440,54 @@ export default function Internships() {
                   {event.description}
                 </p>
               </div>
-              <div className="file-preview" style={{ position: "relative" }}>
-                {event.file ? (
+              <div className="file-preview" style={{ position: "relative", width: "120px", height: "120px", minWidth: "120px", minHeight: "120px", display: "flex", alignItems: "center", justifyContent: "center", background: "#fafafa", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
+                {event.file && event.file.url ? (
                   <>
-                    <FaFileAlt
-                      className="file-logo"
-                      style={{ display: "block", margin: "0 auto" }}
-                    />{" "}
-                    {/* File logo */}
-                    <span
-                      className="file-type"
+                    <img
+                      src={event.file.url}
+                      alt="Certificate"
+                      className="file-image"
+                      referrerPolicy="no-referrer"
+                      onClick={() => window.open(event.file.url, '_blank')}
                       style={{
-                        textAlign: "center",
-                        display: "block",
+                        cursor: "pointer",
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        display: "block"
                       }}
-                    >
-                      {event.file.type}
-                    </span>
-                    <div
-                      className="status-box inside"
-                      style={{
-                        marginTop: "0.5rem",
-                        textAlign: "center",
-                      }}
-                    >
-                      {" "}
-                      {/* Positioned under file logo */}
-                      {event.status === "Approved" ? (
-                        <span className="approved">
-                          <FaCheckCircle /> Approved
-                        </span>
-                      ) : (
-                        <span className="pending">
-                          <FaExclamationCircle /> Pending
-                        </span>
-                      )}
-                    </div>
+                      title="Click to view full image"
+                      onError={e => { e.target.style.display = 'none'; }}
+                    />
                   </>
                 ) : (
-                  <div className="file-placeholder">
-                    <span className="file-type">JPG</span>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                    <FaFileAlt style={{ fontSize: "3rem", color: "#ccc", marginBottom: "0.5rem" }} />
+                    <span className="file-type" style={{ fontSize: "0.9rem", color: "#999" }}>No File</span>
                   </div>
                 )}
+                <div
+                  className="status-box inside"
+                  style={{
+                    marginTop: "0.5rem",
+                    textAlign: "center",
+                    position: "absolute",
+                    bottom: "-2.2rem",
+                    left: 0,
+                    width: "100%"
+                  }}
+                >
+                  {event.status === "Approved" ? (
+                    <span className="approved">
+                      <FaCheckCircle /> Approved
+                    </span>
+                  ) : (
+                    <span className="pending">
+                      <FaExclamationCircle /> Pending
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
