@@ -84,9 +84,9 @@ export default function FacultyDashboard() {
           <h3>Grade Management</h3>
           <p>Review and update student performance</p>
         </div>
-        <div className="card" onClick={() => navigate("/faculty/reports")}>
-          <h3>Pending Requests</h3>
-          <p>Manage all pending student requests efficiently.</p>
+        <div className="card" onClick={() => navigate("/faculty/reports")}> 
+          <h3>Hackathons And Workshops Requests</h3>
+          <p>Manage all hackathon and workshop requests efficiently.</p>
         </div>
       </div>
 

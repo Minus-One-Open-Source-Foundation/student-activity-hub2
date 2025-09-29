@@ -430,6 +430,10 @@ export default function Internships() {
                 >
                   {event.startDate} - {event.endDate}
                 </span>
+                  {/* Internship mode below date */}
+                  <div style={{ fontSize: '1rem', color: '#3a3aee', fontWeight: 600, marginBottom: '0.7rem', textAlign: 'left' }}>
+                    Internship mode: <span style={{ color: '#222', fontWeight: 500 }}>{event.mode || 'Remote'}</span>
+                  </div>
                 <p
                   style={{
                     color: "#444",
@@ -440,54 +444,19 @@ export default function Internships() {
                   {event.description}
                 </p>
               </div>
-              <div className="file-preview" style={{ position: "relative", width: "120px", height: "120px", minWidth: "120px", minHeight: "120px", display: "flex", alignItems: "center", justifyContent: "center", background: "#fafafa", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
-                {event.file && event.file.url ? (
-                  <>
-                    <img
-                      src={event.file.url}
-                      alt="Certificate"
-                      className="file-image"
-                      referrerPolicy="no-referrer"
-                      onClick={() => window.open(event.file.url, '_blank')}
-                      style={{
-                        cursor: "pointer",
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                        display: "block"
-                      }}
-                      title="Click to view full image"
-                      onError={e => { e.target.style.display = 'none'; }}
-                    />
-                  </>
+              {/* Empty rectangle box */}
+              <div style={{ width: '180px', height: '160px', minWidth: '180px', minHeight: '160px', border: '2px dashed #bbb', borderRadius: '12px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}></div>
+              {/* Status below the rectangle box, outside and down */}
+              <div style={{ width: '180px', marginLeft: 'auto', marginTop: '0.7rem', textAlign: 'center' }}>
+                {event.status === "Approved" ? (
+                  <span style={{ color: '#4CAF50', fontWeight: 'bold', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#e8f5e9', borderRadius: '8px', padding: '0.3rem 0.8rem', border: '1.5px solid #4CAF50' }}>
+                    <FaCheckCircle style={{ marginRight: '4px' }} /> Approved
+                  </span>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                    <FaFileAlt style={{ fontSize: "3rem", color: "#ccc", marginBottom: "0.5rem" }} />
-                    <span className="file-type" style={{ fontSize: "0.9rem", color: "#999" }}>No File</span>
-                  </div>
+                  <span style={{ color: '#FF9800', fontWeight: 'bold', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#fff8e1', borderRadius: '8px', padding: '0.3rem 0.8rem', border: '1.5px solid #FF9800' }}>
+                    <FaExclamationCircle style={{ marginRight: '4px' }} /> Pending
+                  </span>
                 )}
-                <div
-                  className="status-box inside"
-                  style={{
-                    marginTop: "0.5rem",
-                    textAlign: "center",
-                    position: "absolute",
-                    bottom: "-2.2rem",
-                    left: 0,
-                    width: "100%"
-                  }}
-                >
-                  {event.status === "Approved" ? (
-                    <span className="approved">
-                      <FaCheckCircle /> Approved
-                    </span>
-                  ) : (
-                    <span className="pending">
-                      <FaExclamationCircle /> Pending
-                    </span>
-                  )}
-                </div>
               </div>
             </div>
           </div>

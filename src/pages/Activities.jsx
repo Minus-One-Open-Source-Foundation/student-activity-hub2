@@ -26,11 +26,11 @@ export default function Activities() {
   return (
     <div className="activities-wrapper">
       <header>
-        <h1>Extra-Curricular Activities</h1>
+        <h1>Co-Curriculars</h1>
         <p>Add and track all your activities</p>
       </header>
 
-      {/* Search + Add Button */}
+      {/* Search + Filters + Add Button */}
       <section className="form-section">
         <input
           type="text"
@@ -39,32 +39,36 @@ export default function Activities() {
           onChange={(e) => setActivity(e.target.value)}
           className="search-bar"
         />
-        <div className="filters">
-          <button
-            className={`filter-btn ${selectedFilter === "All" ? "active" : ""}`}
-            onClick={() => setSelectedFilter("All")}
-          >
-            All
-          </button>
-          <button
-            className={`filter-btn ${selectedFilter === "Participation" ? "active" : ""}`}
-            onClick={() => setSelectedFilter("Participation")}
-          >
-            Participation
-          </button>
-          <button
-            className={`filter-btn ${selectedFilter === "Prize Winning" ? "active" : ""}`}
-            onClick={() => setSelectedFilter("Prize Winning")}
-          >
-            Prize Winning
-          </button>
+        <div className="button-group-under-search">
+          <div className="filters-and-add">
+            <div className="filters">
+              <button
+                className={`filter-btn ${selectedFilter === "All" ? "active" : ""}`}
+                onClick={() => setSelectedFilter("All")}
+              >
+                All
+              </button>
+              <button
+                className={`filter-btn ${selectedFilter === "Participation" ? "active" : ""}`}
+                onClick={() => setSelectedFilter("Participation")}
+              >
+                Participation
+              </button>
+              <button
+                className={`filter-btn ${selectedFilter === "Prize Winning" ? "active" : ""}`}
+                onClick={() => setSelectedFilter("Prize Winning")}
+              >
+                Prize Winning
+              </button>
+            </div>
+            <button
+              className="add-btn"
+              onClick={() => setShowForm(true)}
+            >
+              Add Activity
+            </button>
+          </div>
         </div>
-        <button
-          className="add-btn"
-          onClick={() => setShowForm(true)}
-        >
-          Add Activity
-        </button>
       </section>
 
       {/* Modal Form */}
@@ -192,7 +196,7 @@ export default function Activities() {
         /* Only this section changes for full button gradient color */
         .add-btn {
           padding: 0.75rem 1.6rem;
-          background: linear-gradient(90deg, #ff6a00, #ee0979);
+          background: linear-gradient(90deg, #ff6a00 0%, #ee0979 100%) !important;
           border: none;
           color: #fff;
           font-weight: 600;
@@ -335,6 +339,21 @@ export default function Activities() {
         .filter-btn:hover {
           transform: translateY(-2px);
           box-shadow: 0 10px 30px rgba(238, 9, 121, 0.18);
+        }
+        .button-group-under-search {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .filters-and-add {
+          display: flex;
+          flex-direction: row;
+          gap: 1.2rem;
+          align-items: center;
+          margin-top: 0.7rem;
+          flex-wrap: wrap;
+          justify-content: center;
         }
         .filters {
           display: flex;
