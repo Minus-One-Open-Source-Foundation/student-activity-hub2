@@ -1,53 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch, FaTrash } from "react-icons/fa";
+import api from "../services/api";
 
 export default function StudentManagement() {
-  const [students, setStudents] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      dob: "2003-05-12",
-      phone: "9876543210",
-      email: "john@example.com",
-      department: "CSE",
-      regno: "CSE2023001",
-      status: "Active",
-      profilePic: "/src/assets/default-profile.jpg",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      dob: "2004-02-20",
-      phone: "9123456780",
-      email: "jane@example.com",
-      department: "ECE",
-      regno: "ECE2023002",
-      status: "Inactive",
-      profilePic: "/src/assets/default-profile.jpg",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      dob: "2002-10-10",
-      phone: "9001234567",
-      email: "mike@example.com",
-      department: "MECH",
-      regno: "MECH2023003",
-      status: "Active",
-      profilePic: "/src/assets/default-profile.jpg",
-    },
-  ]);
-
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const [studentToDelete, setStudentToDelete] = useState(null);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [showReasonPopup, setShowReasonPopup] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
 
+  // Load all profiles on component mount
+  useEffect(() => {
+    loadAllProfiles();
+  }, []);
+
+  const loadAllProfiles = async () => {
+    try {
+      setLoading(true);
+      console.log('🔄 Starting to load profiles...');
+      const profiles = await api.getAllProfiles();
+      console.log('✅ Profiles loaded successfully:', profiles);
+      setStudents(profiles);
+      setError(null);
+    } catch (err) {
+      console.error('❌ Error loading profiles:', err);
+      console.error('Error details:', {
+        message: err.message,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data
+      });
+      setError(`Failed to load student profiles: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredStudents = students.filter(
     (s) =>
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.regno.toLowerCase().includes(search.toLowerCase())
+      (s.name && s.name.toLowerCase().includes(search.toLowerCase())) ||
+      (s.registerNumber && s.registerNumber.toLowerCase().includes(search.toLowerCase()))
   );
 
   const handleDeleteClick = (student) => {
@@ -60,18 +55,26 @@ export default function StudentManagement() {
     setShowReasonPopup(true);
   };
 
-  const submitReason = () => {
+    const submitReason = async () => {
     if (deleteReason.trim() === "") {
       alert("Please enter a reason for deletion.");
       return;
     }
-    setStudents(students.filter((s) => s.id !== studentToDelete.id));
-    console.log(
-      `Student ${studentToDelete.name} deleted. Reason: ${deleteReason}`
-    );
-    setDeleteReason("");
-    setStudentToDelete(null);
-    setShowReasonPopup(false);
+    
+    try {
+      await api.deleteUserByEmail(studentToDelete.email);
+      setStudents(students.filter((s) => s.email !== studentToDelete.email));
+      console.log(
+        `Student ${studentToDelete.name} deleted. Reason: ${deleteReason}`
+      );
+      alert(`Student ${studentToDelete.name} has been successfully deleted.`);
+      setDeleteReason("");
+      setStudentToDelete(null);
+      setShowReasonPopup(false);
+    } catch (err) {
+      console.error('Error deleting student:', err);
+      alert('Failed to delete student. Please try again.');
+    }
   };
 
   return (
@@ -94,60 +97,82 @@ export default function StudentManagement() {
         </div>
       </div>
 
-      {/* Student Grid */}
-      <div className="student-grid-container">
-        <div className="student-grid">
-          {filteredStudents.map((student) => (
-            <div className="student-card" key={student.id}>
-              {/* Delete Button */}
-              <button
-                className="delete-button"
-                onClick={() => handleDeleteClick(student)}
-              >
-                <FaTrash />
-              </button>
+      {/* Loading State */}
+      {loading && (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading students...</p>
+        </div>
+      )}
 
-              {/* Profile Photo */}
-              <div className="profile-section">
-                <div className="profile-photo">
-                  <img src={student.profilePic} alt={student.name} />
+      {/* Error State */}
+      {error && (
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={loadAllProfiles} className="retry-button">
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Student Grid */}
+      {!loading && !error && (
+        <div className="student-grid-container">
+          <div className="student-grid">
+            {filteredStudents.map((student) => (
+              <div className="student-card" key={student.email}>
+                {/* Delete Button */}
+                <button
+                  className="delete-button"
+                  onClick={() => handleDeleteClick(student)}
+                >
+                  <FaTrash />
+                </button>
+
+                {/* Profile Photo */}
+                <div className="profile-section">
+                  <div className="profile-photo">
+                    <img 
+                      src={student.profileImageUrl || "/src/assets/default-profile.jpg"} 
+                      alt={student.name || "Student"} 
+                      onError={(e) => {
+                        e.target.src = "/src/assets/default-profile.jpg";
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Student Info */}
+                <div className="student-info">
+                  <h2>{student.name || "N/A"}</h2>
+                  <p>
+                    <strong>Date of Birth:</strong> {student.dateOfBirth || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Register No:</strong> {student.registerNumber || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Department:</strong> {student.department || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {student.email}
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> {student.phoneNumber || "N/A"}
+                  </p>
+                  <span className="status-badge active">
+                    Active
+                  </span>
                 </div>
               </div>
+            ))}
 
-              {/* Student Info */}
-              <div className="student-info">
-                <h2>{student.name}</h2>
-                <p>
-                  <strong>Date of Birth:</strong> {student.dob}
-                </p>
-                <p>
-                  <strong>Register No:</strong> {student.regno}
-                </p>
-                <p>
-                  <strong>Department:</strong> {student.department}
-                </p>
-                <p>
-                  <strong>Email:</strong> {student.email}
-                </p>
-                <p>
-                  <strong>Phone:</strong> {student.phone}
-                </p>
-                <span
-                  className={`status-badge ${
-                    student.status === "Active" ? "active" : "inactive"
-                  }`}
-                >
-                  {student.status}
-                </span>
-              </div>
-            </div>
-          ))}
-
-          {filteredStudents.length === 0 && (
-            <p className="no-data">No students found</p>
-          )}
+            {filteredStudents.length === 0 && !loading && !error && (
+              <p className="no-data">No students found</p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Confirmation Popup */}
       {showConfirmPopup && (
@@ -385,6 +410,62 @@ export default function StudentManagement() {
           text-align: center;
           font-size: 1rem;
           color: #6b7280;
+        }
+
+        /* Loading and Error States */
+        .loading-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 3rem;
+          text-align: center;
+        }
+
+        .loading-spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #e5e7eb;
+          border-left: 4px solid #3b82f6;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .error-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 3rem;
+          text-align: center;
+        }
+
+        .error-container p {
+          color: #dc2626;
+          margin-bottom: 1rem;
+          font-size: 1.1rem;
+        }
+
+        .retry-button {
+          background: #3b82f6;
+          color: white;
+          border: none;
+          padding: 0.75rem 1.5rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 600;
+          transition: background 0.2s;
+        }
+
+        .retry-button:hover {
+          background: #2563eb;
         }
 
         /* Popup Styles */

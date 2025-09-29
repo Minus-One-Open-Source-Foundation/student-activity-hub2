@@ -56,6 +56,17 @@ api.interceptors.response.use(
   }
 );
 
+// Add methods to the api instance
+api.getAllProfiles = async () => {
+  const response = await api.get('/profile/all');
+  return response.data;
+};
+
+api.deleteUserByEmail = async (email) => {
+  const response = await api.delete(`/profile/user/${email}`);
+  return response.data;
+};
+
 // Authentication API functions
 export const authAPI = {
   login: async (email, password) => {
