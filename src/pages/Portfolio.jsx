@@ -4,13 +4,14 @@ import { FaTrash, FaDownload } from "react-icons/fa";
 export default function ResumeManagement() {
   const [resumes, setResumes] = useState([]);
 
+  // Ensure the resumes are displayed in the order they are uploaded without changing the layout or alignment
   const handleUpload = (e) => {
     const uploadedFiles = Array.from(e.target.files);
     const newResumes = uploadedFiles.map((file) => ({
       file,
       role: "",
     }));
-    setResumes([...resumes, ...newResumes]);
+    setResumes((prevResumes) => [...prevResumes, ...newResumes]);
   };
 
   const handleDelete = (index) => {
@@ -30,6 +31,16 @@ export default function ResumeManagement() {
     link.download = file.name;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handlePreview = (file) => {
+    const url = URL.createObjectURL(file);
+    window.open(url, '_blank');
+  };
+
+  const handleSaveRole = (index) => {
+    const role = resumes[index].role;
+    alert(`Role saved: ${role}`); // Replace with actual save logic
   };
 
   return (
@@ -56,24 +67,50 @@ export default function ResumeManagement() {
         ) : (
           resumes.map((resume, index) => (
             <div key={index} className="resume-card">
-              <div className="resume-preview">
+              <div
+                className="resume-preview"
+                onClick={() => handlePreview(resume.file)}
+                style={{ cursor: 'pointer' }}
+              >
                 <iframe
                   src={URL.createObjectURL(resume.file)}
                   title="Resume Preview"
                   style={{
                     width: "200px",
-                    height: "200px",
+                    height: "350px", // Increased height to make the PDF length larger inside the box
                     border: "none",
-                    aspectRatio: "1 / 1",
+                    pointerEvents: "none", // Prevent scrolling
                   }}
                 ></iframe>
               </div>
-              <input
-                type="text"
-                placeholder="Enter role description"
-                value={resume.role}
-                onChange={(e) => handleRoleChange(index, e.target.value)}
-              />
+              <div style={{ position: 'relative', width: '100%' }}>
+                <input
+                  type="text"
+                  placeholder="Enter role description"
+                  value={resume.role}
+                  onChange={(e) => handleRoleChange(index, e.target.value)}
+                  style={{ width: '80%', paddingRight: '4rem' }} // Reduced width to ensure the button fits properly
+                />
+                <button
+                  onClick={() => handleSaveRole(index)}
+                  style={{
+                    position: 'absolute',
+                    right: '0.5rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'red',
+                    color: 'white',
+                    padding: '0.3rem 0.5rem',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    width: '3rem', // Adjusted width to fit inside the box
+                    height: '1.5rem', // Adjusted height to fit inside the box
+                  }}
+                >
+                  Save
+                </button>
+              </div>
               <p className="role-display">Role: {resume.role}</p>
               <button onClick={() => handleDownload(resume.file)}>
                 <FaDownload />
@@ -132,16 +169,17 @@ export default function ResumeManagement() {
         .resumes-container {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 1.5rem;
+          gap: 1rem; /* Increased gap slightly to provide more space between cards */
         }
 
         .resume-card {
+          width: 337px; /* Increased width of the card to reduce space between cards */
           background: #f9f9f9;
-          border-radius: 16px;
-          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          padding: 0.5rem; /* Reduced padding to minimize space */
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          gap: 0.2rem; /* Reduced gap between elements inside the card */
           font-weight: 600;
           transition: transform 0.25s, box-shadow 0.25s;
           align-items: center;
@@ -161,6 +199,7 @@ export default function ResumeManagement() {
           align-items: center;
           border-radius: 8px;
           overflow: hidden;
+          margin: 0 auto;
         }
 
         .resume-card input {
