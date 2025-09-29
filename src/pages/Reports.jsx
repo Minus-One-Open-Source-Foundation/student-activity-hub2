@@ -40,7 +40,8 @@ export default function PendingRequests() {
             <button className="approve-btn">Approve</button>
             <button className="reject-btn">Reject</button>
           </div>
-
+          {/* Rectangle box at bottom right under Pending, shown for every request */}
+          <div className="empty-certificate-box" />
           {/* JPG file logo placeholder */}
           <div className="file-icon-container">
             <img src={req.fileLogo} alt="File logo" className="file-logo" />
@@ -48,7 +49,7 @@ export default function PendingRequests() {
         </div>
       ))}
 
-      <style>{`
+  <style>{`
         .pending-requests-wrapper {
           min-height: 100vh;
           padding: 2rem;
@@ -81,7 +82,7 @@ export default function PendingRequests() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 0.75rem;
+          margin-bottom: 1.5rem;
         }
         .request-header h3 {
           font-size: 1.25rem;
@@ -93,6 +94,7 @@ export default function PendingRequests() {
           font-size: 0.9rem;
           color: #ff9800;
           font-weight: 600;
+          margin-bottom: 0.2rem;
         }
         .pending-status svg {
           margin-right: 0.3rem;
@@ -127,6 +129,29 @@ export default function PendingRequests() {
           height: 100px;
           object-fit: contain;
         }
+        .empty-certificate-box {
+          width: 180px;
+          height: 140px;
+          background: #f1f5f9;
+          border: 2px dashed #64748b;
+          border-radius: 12px;
+          position: absolute;
+          right: 1rem;
+          bottom: 1rem;
+          z-index: 2;
+        }
+        .empty-certificate-box {
+          width: 180px;
+          height: 140px;
+          background: #e0e7ef;
+          border: 2px dashed #64748b;
+          border-radius: 12px;
+          position: absolute;
+          right: 1rem;
+          bottom: 1rem;
+          z-index: 1;
+        }
+
       `}</style>
     </div>
   );
