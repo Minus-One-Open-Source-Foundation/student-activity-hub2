@@ -34,7 +34,11 @@ export default function Navbar({ onToggleSidebar }) {
             color: "#ffd700",
           }}
         >
-          {user?.role === "faculty" ? "Faculty Hub" : "Student Activity Hub"}
+          {user
+            ? (user.role && user.role.toLowerCase() === "faculty")
+              ? "Faculty Hub"
+              : "Student Activity Hub"
+            : "Student Activity Hub"}
         </Typography>
         <div
           style={{

@@ -2,26 +2,25 @@ import React, { useState, useEffect } from "react";
 import { FaClock, FaCheck, FaTimes, FaSpinner } from "react-icons/fa";
 import { facultyAPI } from "../services/api";
 
-export default function PendingRequests() {
+export default function Reports() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingId, setProcessingId] = useState(null);
+  const [filter, setFilter] = useState('PENDING');
 
-  // Fetch pending requests on component mount
   useEffect(() => {
-    fetchPendingRequests();
-  }, []);
+    fetchRequestsByStatus(filter);
+  }, [filter]);
 
-  const fetchPendingRequests = async () => {
+  const fetchRequestsByStatus = async (status) => {
     try {
       setLoading(true);
-      const pendingEvents = await facultyAPI.getPendingEvents();
-      setRequests(pendingEvents);
+      const events = await facultyAPI.getEventsByStatus(status);
+      setRequests(events);
       setError(null);
     } catch (err) {
-      console.error('Error fetching pending requests:', err);
-      setError('Failed to load pending requests. Please try again.');
+      setError('Failed to load requests. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -90,7 +89,7 @@ export default function PendingRequests() {
       <div className="pending-requests-wrapper">
         <div className="loading-container">
           <FaSpinner className="spinner" />
-          <p>Loading pending requests...</p>
+          <p>Loading {filter.toLowerCase()} requests...</p>
         </div>
       </div>
     );
@@ -101,7 +100,7 @@ export default function PendingRequests() {
       <div className="pending-requests-wrapper">
         <div className="error-container">
           <p className="error-message">{error}</p>
-          <button onClick={fetchPendingRequests} className="retry-btn">
+          <button onClick={() => fetchRequestsByStatus(filter)} className="retry-btn">
             Retry
           </button>
         </div>
@@ -111,77 +110,88 @@ export default function PendingRequests() {
 
   return (
     <div className="pending-requests-wrapper">
-      <h2 className="page-title">Pending Requests</h2>
+      <h2 className="page-title">{filter.charAt(0) + filter.slice(1).toLowerCase()} Requests</h2>
+      <div className="filter-btn-group">
+        <button className={`filter-btn pending-btn ${filter === 'PENDING' ? 'active' : ''}`} onClick={() => setFilter('PENDING')}>
+          <FaClock style={{marginRight: '0.5em'}} /> Pending
+        </button>
+        <button className={`filter-btn approved-btn ${filter === 'APPROVED' ? 'active' : ''}`} onClick={() => setFilter('APPROVED')}>
+          <FaCheck style={{marginRight: '0.5em'}} /> Approved
+        </button>
+        <button className={`filter-btn rejected-btn ${filter === 'REJECTED' ? 'active' : ''}`} onClick={() => setFilter('REJECTED')}>
+          <FaTimes style={{marginRight: '0.5em'}} /> Rejected
+        </button>
+      </div>
 
       {requests.length === 0 ? (
         <div className="no-requests">
-          <p>No pending requests at the moment.</p>
+          <p>No {filter.toLowerCase()} requests at the moment.</p>
         </div>
       ) : (
         requests.map((req) => (
           <div className="request-box" key={req.id}>
-            <div className="request-header">
-              <h3>{getEventTypeDisplay(req.type)} Request</h3>
-              <span className="pending-status">
-                <FaClock /> Pending
-              </span>
-            </div>
-            
-            <div className="request-content">
-              <p><strong>Student:</strong> {req.userEmail}</p>
-              <p><strong>Title:</strong> {req.title}</p>
-              {req.description && (
-                <p><strong>Description:</strong> {req.description}</p>
-              )}
-              <p><strong>Event Date:</strong> {formatDate(req.eventDate)}</p>
-              <p><strong>Submitted:</strong> {formatDate(req.createdAt)}</p>
-              
-              {/* File info */}
-              {req.fileName && (
-                <p><strong>File:</strong> {req.fileName}</p>
-              )}
-              
-              <div className="action-buttons">
-                <button 
-                  className="approve-btn"
-                  onClick={() => handleApprove(req.id)}
-                  disabled={processingId === req.id}
-                >
-                  {processingId === req.id ? (
-                    <FaSpinner className="spinner" />
-                  ) : (
-                    <FaCheck />
-                  )}
-                  Approve
-                </button>
-                <button 
-                  className="reject-btn"
-                  onClick={() => handleReject(req.id)}
-                  disabled={processingId === req.id}
-                >
-                  {processingId === req.id ? (
-                    <FaSpinner className="spinner" />
-                  ) : (
-                    <FaTimes />
-                  )}
-                  Reject
-                </button>
-              </div>
-            </div>
-            
-            {/* Certificate/Document preview box */}
-            <div className="document-preview-box">
-              {req.imageUrl ? (
-                <img 
-                  src={req.imageUrl} 
-                  alt="Event document" 
-                  className="document-preview"
-                />
-              ) : (
-                <div className="no-document">
-                  <p>No document attached</p>
+            <div className="request-box-inner">
+              <div className="request-details">
+                <div className="request-header">
+                  <h3>{getEventTypeDisplay(req.type)} Request</h3>
+                  {filter === 'PENDING' && <span className="pending-status"><FaClock /> Pending</span>}
+                  {filter === 'APPROVED' && <span className="approved-status"><FaCheck /> Approved</span>}
+                  {filter === 'REJECTED' && <span className="rejected-status"><FaTimes /> Rejected</span>}
                 </div>
-              )}
+                <div className="request-content">
+                  <p><strong>Student:</strong> {req.userEmail}</p>
+                  <p><strong>Title:</strong> {req.title}</p>
+                  {req.description && (
+                    <p><strong>Description:</strong> {req.description}</p>
+                  )}
+                  <p><strong>Event Date:</strong> {formatDate(req.eventDate)}</p>
+                  <p><strong>Submitted:</strong> {formatDate(req.createdAt)}</p>
+                  {req.fileName && (
+                    <p><strong>File:</strong> {req.fileName}</p>
+                  )}
+                  {filter === 'PENDING' && (
+                    <div className="action-buttons">
+                      <button 
+                        className="approve-btn"
+                        onClick={() => handleApprove(req.id)}
+                        disabled={processingId === req.id}
+                      >
+                        {processingId === req.id ? (
+                          <FaSpinner className="spinner" />
+                        ) : (
+                          <FaCheck />
+                        )}
+                        Approve
+                      </button>
+                      <button 
+                        className="reject-btn"
+                        onClick={() => handleReject(req.id)}
+                        disabled={processingId === req.id}
+                      >
+                        {processingId === req.id ? (
+                          <FaSpinner className="spinner" />
+                        ) : (
+                          <FaTimes />
+                        )}
+                        Reject
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="document-preview-box">
+                {req.imageUrl ? (
+                  <img 
+                    src={req.imageUrl} 
+                    alt="Event document" 
+                    className="document-preview"
+                  />
+                ) : (
+                  <div className="no-document">
+                    <p>No document attached</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))
@@ -226,21 +236,55 @@ export default function PendingRequests() {
           font-size: 1.1rem;
           margin-bottom: 1rem;
         }
-        .retry-btn {
-          background-color: #007bff;
-          color: white;
-          border: none;
-          padding: 0.5rem 1rem;
-          border-radius: 4px;
-          cursor: pointer;
+        .filter-btn-group {
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-start;
+          align-items: center;
+          gap: 0.7rem;
+          margin-bottom: 2.2rem;
+          margin-top: 1.2rem;
+        }
+        .filter-btn {
+          padding: 0.5rem 1.2rem;
+          font-weight: 600;
           font-size: 1rem;
+          border: none;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.18s;
+          display: flex;
+          align-items: center;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+          background: #f3f4f6;
+          color: #222;
+          margin: 0;
+          letter-spacing: 0.2px;
+          min-width: 120px;
         }
-        .retry-btn:hover {
-          background-color: #0056b3;
+        .filter-btn.pending-btn {
+          background: linear-gradient(90deg, #ffe29f 0%, #ffa99f 100%);
+          color: #b26a00;
         }
-        .no-requests {
-          text-align: center;
-          padding: 3rem;
+        .filter-btn.approved-btn {
+          background: linear-gradient(90deg, #a8ff78 0%, #78ffd6 100%);
+          color: #0a7d3b;
+        }
+        .filter-btn.rejected-btn {
+          background: linear-gradient(90deg, #ff5858 0%, #f09819 100%);
+          color: #a80000;
+        }
+        .filter-btn:hover, .filter-btn:focus {
+          filter: brightness(0.95) saturate(1.2);
+          transform: translateY(-2px) scale(1.04);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+        }
+        .filter-btn.active {
+          border: 2px solid #333;
+          color: #fff !important;
+          filter: brightness(1.08) saturate(1.2);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+        }
           background: rgba(255, 255, 255, 0.9);
           border-radius: 8px;
           margin: 2rem auto;
@@ -248,16 +292,106 @@ export default function PendingRequests() {
         }
         .request-box {
           background: #fff;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          padding: 1.5rem;
-          margin-bottom: 1.5rem;
+          border-radius: 16px;
+          box-shadow: 0 4px 18px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.07);
+          padding: 1.5rem 1.7rem 1.2rem 1.7rem;
+          margin-bottom: 2.2rem;
           text-align: left;
           position: relative;
           display: flex;
+          flex-direction: row;
+          min-height: 120px;
+          transition: box-shadow 0.18s, transform 0.18s;
+          align-items: flex-start;
+        }
+        .request-box {
+          background: #fff !important;
+          border-radius: 20px;
+          box-shadow: 0 6px 32px 0 rgba(0,0,0,0.13), 0 2px 8px 0 rgba(0,0,0,0.09);
+          border: 2px solid #e0e0e0;
+          padding: 0;
+          margin-bottom: 3.2rem;
+          margin-top: 0.7rem;
+          text-align: left;
+          position: relative;
+          width: 100%;
+          max-width: none;
+        }
+        .request-box-inner {
+          display: flex;
+          flex-direction: row;
+          align-items: stretch;
+          padding: 2.8rem 3.2rem 2.2rem 3.2rem;
+          min-height: 180px;
+        }
+        .request-details {
+          flex: 1 1 0%;
+          min-width: 0;
+          display: flex;
           flex-direction: column;
-          min-height: 200px;
-          transition: transform 0.2s ease;
+          justify-content: space-between;
+        }
+        .document-preview-box {
+          width: 240px;
+          height: 200px;
+          background: #f8f9fa;
+          border: 2.5px dashed #dee2e6;
+          border-radius: 12px;
+          margin-left: 3.2rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          position: static;
+        }
+        @media (max-width: 1200px) {
+          .request-box {
+            max-width: 98vw;
+          }
+          .request-box-inner {
+            padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+          }
+          .document-preview-box {
+            width: 180px;
+            height: 160px;
+            margin-left: 1.2rem;
+            border-radius: 8px;
+          }
+        }
+        @media (max-width: 900px) {
+          .request-box-inner {
+            flex-direction: column;
+            padding: 1.2rem 1rem 1.2rem 1rem;
+          }
+          .document-preview-box {
+            margin-left: 0;
+            margin-top: 1.2rem;
+            width: 100%;
+            max-width: 220px;
+            align-self: center;
+          }
+        }
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        @media (max-width: 900px) {
+          .request-box {
+            flex-direction: column;
+            padding: 1.2rem 1rem 1.2rem 1rem;
+          }
+          .request-content {
+            padding-right: 0;
+          }
+          .document-preview-box {
+            position: static;
+            margin: 1rem auto 0 auto;
+            width: 100%;
+            max-width: 220px;
+            top: unset;
+            right: unset;
+          }
         }
         .request-content {
           padding-right: 200px;
@@ -291,6 +425,20 @@ export default function PendingRequests() {
         }
         .pending-status svg {
           margin-right: 0.3rem;
+        }
+        .approved-status {
+          color: #10b981;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+        }
+        .rejected-status {
+          color: #dc3545;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
         }
         .action-buttons {
           margin-top: 1.5rem;
