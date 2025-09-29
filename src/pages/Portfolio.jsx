@@ -112,12 +112,46 @@ export default function ResumeManagement() {
                 </button>
               </div>
               <p className="role-display">Role: {resume.role}</p>
-              <button onClick={() => handleDownload(resume.file)}>
-                <FaDownload />
+              <button
+                onClick={() => handleDownload(resume.file)}
+                style={{
+                  background: "linear-gradient(90deg, #6a11cb, #2575fc)",
+                  color: "#fff",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "8px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = "translateY(-2px)";
+                  e.target.style.boxShadow = "0 6px 20px rgba(0,0,0,0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = "translateY(0)";
+                  e.target.style.boxShadow = "none";
+                }}
+              >
+                Download
               </button>
-              <button onClick={() => handleDelete(index)}>
-                <FaTrash />
-              </button>
+              <div style={{ position: "relative", width: "100%" }}>
+                <button
+                  onClick={() => handleDelete(index)}
+                  style={{
+                    position: "absolute",
+                    top: "0.5rem",
+                    right: "0.5rem",
+                    background: "none",
+                    border: "none",
+                    color: "#ff4b5c",
+                    cursor: "pointer",
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  <FaTrash />
+                </button>
+              </div>
             </div>
           ))
         )}
@@ -173,7 +207,8 @@ export default function ResumeManagement() {
         }
 
         .resume-card {
-          width: 337px; /* Increased width of the card to reduce space between cards */
+          width: 345px; /* Increased width to accommodate the delete logo inside the card */
+          height: 400px; /* Increased height for better spacing */
           background: #f9f9f9;
           border-radius: 12px;
           padding: 0.5rem; /* Reduced padding to minimize space */
