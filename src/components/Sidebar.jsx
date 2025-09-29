@@ -32,7 +32,7 @@ export default function Sidebar({ open = false, onClose }) {
     { to: "/internships", label: "Internships" }, // Added
   { to: "/activities", label: "Co-Curricular" },
     { to: "/achievements", label: "Achievements" },
-    { to: "/portfolio", label: "Portfolio" },
+    { to: "/portfolio", label: "URMS" },
     { to: "/analytics", label: "Analytics" },
   ];
 

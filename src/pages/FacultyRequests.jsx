@@ -192,8 +192,9 @@ const FacultyRequests = () => {
                     </span>
                   </div>
 
-                  <div className="event-content" style={{ position: 'relative' }}>
+                  <div className="event-content">
                     <p className="event-description">{event.description}</p>
+                    
                     <div className="event-details">
                       <div className="detail-item">
                         <strong>Student:</strong> {event.userEmail}
@@ -210,27 +211,13 @@ const FacultyRequests = () => {
                         </div>
                       )}
                     </div>
+
                     {event.imageUrl && (
                       <div className="event-image">
                         <img src={event.imageUrl} alt="Event" />
                       </div>
                     )}
-                    {/* Status below the event-image/file, inside event-content */}
-                    <div style={{ position: 'absolute', right: '2rem', bottom: '1.2rem', width: '120px', textAlign: 'center' }}>
-                      {event.status === 'APPROVED' ? (
-                        <span className="approved">
-                          <FaCheckCircle /> Approved
-                        </span>
-                      ) : event.status === 'REJECTED' ? (
-                        <span className="rejected">
-                          <FaExclamationCircle /> Rejected
-                        </span>
-                      ) : (
-                        <span className="pending">
-                          <FaExclamationCircle /> Pending
-                        </span>
-                      )}
-                    </div>
+                  </div>
 
                   {event.status === 'PENDING' && (
                     <div className="event-actions">

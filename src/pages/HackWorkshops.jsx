@@ -284,55 +284,125 @@ export default function HackWorkshops() {
                     <>
                       {console.log('Rendering image for event:', event.id, 'URL:', event.file.url)}
                       {/* Force image display with multiple approaches */}
-                      <div key={event.id} className="event-card" style={{ position: 'relative' }}>
-                        <div className={`badge ${event.type.toLowerCase()}`}>{event.type}</div>
-                        <div className="event-main" style={{ display: 'flex', flexDirection: 'row', gap: '2rem', alignItems: 'flex-start' }}>
-                          <div className="event-info">
-                            <h3 className="event-title">{event.type}</h3>
-                            <h4 className="event-subtitle">{event.title}</h4>
-                            <span className="date">{event.date}</span>
-                            <p>{event.description}</p>
-                          </div>
-                          <div className="file-preview">
-                            {event.file && event.file.url ? (
-                              <img 
-                                src={event.file.url}
-                                alt="Certificate" 
-                                className="file-image"
-                                referrerPolicy="no-referrer"
-                                onClick={() => window.open(event.file.url, '_blank')}
-                                style={{ 
-                                  cursor: "pointer",
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                  borderRadius: "8px",
-                                  display: "block"
-                                }}
-                                title="Click to view full image"
-                                onError={e => { e.target.style.display = 'none'; }}
-                              />
-                            ) : (
-                              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                                <FaFileAlt style={{ fontSize: "3rem", color: "#ccc", marginBottom: "0.5rem" }} />
-                                <span className="file-type" style={{ fontSize: "0.9rem", color: "#999" }}>No File</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        {/* Status below the file-preview box, inside event-card */}
-                        <div style={{ position: 'absolute', right: '2rem', bottom: '1.2rem', width: '180px', textAlign: 'center' }}>
-                          {event.status === "Approved" ? (
-                            <span className="approved" style={{ color: "#4CAF50", fontWeight: "bold", fontSize: "0.9rem" }}>
-                              <FaCheckCircle style={{ marginRight: "4px" }} /> Approved
-                            </span>
-                          ) : (
-                            <span className="pending" style={{ color: "#FF9800", fontWeight: "bold", fontSize: "0.9rem" }}>
-                              <FaExclamationCircle style={{ marginRight: "4px" }} /> Pending
-                            </span>
-                          )}
-                        </div>
+                      <img 
+                        src={event.file.url}
+                        alt="Certificate" 
+                        className="file-image"
+                        referrerPolicy="no-referrer"
+                        onClick={() => window.open(event.file.url, '_blank')}
+                        style={{ 
+                          cursor: "pointer",
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                          display: "block"
+                        }}
+                        title="Click to view full image"
+                        onError={(e) => {
+                          console.error('IMG tag failed to load:', event.file.url);
+                          console.log('Trying background image approach...');
+                          
+                          // Hide the failed img tag
+                          e.target.style.display = 'none';
+                          
+                          // Show the background image div
+                          const backgroundDiv = e.target.nextSibling;
+                          if (backgroundDiv) {
+                            backgroundDiv.style.display = 'block';
+                            console.log('Switched to background image approach');
+                          } else {
+                            // If background div doesn't work, show file icon
+                            const fallback = e.target.nextSibling?.nextSibling;
+                            if (fallback) fallback.style.display = 'flex';
+                          }
+                        }}
+                        onLoad={(e) => {
+                          console.log('Image loaded successfully!', {
+                            url: event.file.url,
+                            naturalWidth: e.target.naturalWidth,
+                            naturalHeight: e.target.naturalHeight,
+                            displayWidth: e.target.width,
+                            displayHeight: e.target.height
+                          });
+                        }}
+                      />
+                      {/* Alternative: Background image approach */}
+                      <div 
+                        style={{ 
+                          display: "none", 
+                          width: "100%",
+                          height: "100%",
+                          backgroundImage: `url(${event.file.url})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          backgroundRepeat: "no-repeat",
+                          borderRadius: "8px",
+                          cursor: "pointer"
+                        }}
+                        onClick={() => window.open(event.file.url, '_blank')}
+                        title="Click to view full image"
+                      ></div>
+                      
+                      {/* Fallback file icon (initially hidden) */}
+                      <div 
+                        style={{ 
+                          display: "none", 
+                          flexDirection: "column", 
+                          alignItems: "center", 
+                          justifyContent: "center", 
+                          height: "100%",
+                          width: "100%" 
+                        }}
+                      >
+                        <FaFileAlt 
+                          className="file-logo" 
+                          style={{ 
+                            fontSize: "3rem",
+                            color: "#a18cd1",
+                            marginBottom: "0.5rem",
+                            cursor: "pointer"
+                          }} 
+                          onClick={() => window.open(event.file.url, '_blank')}
+                          title="Click to download"
+                        />
+                        <span className="file-type" style={{ fontSize: "0.9rem", color: "#666" }}>
+                          {event.file.type || 'FILE'}
+                        </span>
                       </div>
+                    </>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                      <FaFileAlt style={{ fontSize: "3rem", color: "#ccc", marginBottom: "0.5rem" }} />
+                      <span className="file-type" style={{ fontSize: "0.9rem", color: "#999" }}>No File</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Status below the JPG box */}
+                <div className="status-box" style={{ textAlign: "center", marginTop: "0.5rem" }}>
+                  {event.status === "Approved" ? (
+                    <span className="approved" style={{ color: "#4CAF50", fontWeight: "bold", fontSize: "0.9rem" }}>
+                      <FaCheckCircle style={{ marginRight: "4px" }} /> Approved
+                    </span>
+                  ) : (
+                    <span className="pending" style={{ color: "#FF9800", fontWeight: "bold", fontSize: "0.9rem" }}>
+                      <FaExclamationCircle style={{ marginRight: "4px" }} /> Pending
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </section>
+
+      <style>{`
+        .hackworkshops-wrapper {
+          min-height: 100vh;
+          padding: 2rem 1rem;
+          font-family: 'Inter', sans-serif;
+          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
           background-size: cover;
           color: #111;
         }
