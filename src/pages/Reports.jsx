@@ -8,6 +8,7 @@ export default function Reports() {
   const [error, setError] = useState(null);
   const [processingId, setProcessingId] = useState(null);
   const [filter, setFilter] = useState('PENDING');
+  const [modalImage, setModalImage] = useState(null);
 
   useEffect(() => {
     fetchRequestsByStatus(filter);
@@ -185,12 +186,74 @@ export default function Reports() {
                     src={req.imageUrl} 
                     alt="Event document" 
                     className="document-preview"
+                    style={{cursor: 'pointer'}}
+                    onClick={() => setModalImage(req.imageUrl)}
                   />
                 ) : (
                   <div className="no-document">
                     <p>No document attached</p>
                   </div>
                 )}
+      {/* Modal for viewing image */}
+      {modalImage && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.7)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+          onClick={() => setModalImage(null)}
+        >
+          <span
+            style={{
+              position: 'absolute',
+              top: '2.5%',
+              right: '3%',
+              fontSize: '1.4rem',
+              color: '#fff',
+              cursor: 'pointer',
+              zIndex: 10000,
+              fontWeight: 700,
+              userSelect: 'none',
+              background: 'rgba(0,0,0,0.25)',
+              borderRadius: '50%',
+              width: '1.8em',
+              height: '1.8em',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'background 0.18s',
+            }}
+            onClick={e => { e.stopPropagation(); setModalImage(null); }}
+            title="Close"
+          >
+            &#10005;
+          </span>
+          <img
+            src={modalImage}
+            alt="Preview"
+            style={{
+              width: 'auto',
+              height: 'auto',
+              maxWidth: '100vw',
+              maxHeight: '100vh',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+              background: '#fff',
+              padding: '1.5rem',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
               </div>
             </div>
           </div>
