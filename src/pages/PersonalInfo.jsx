@@ -129,6 +129,12 @@ export default function StudentProfile() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
+    // Prevent email changes - email can only be changed through Transfer Account
+    if (name === 'email') {
+      console.log('Email changes are not allowed through edit profile. Use Transfer Account instead.');
+      return;
+    }
+    
     // Real-time phone number validation - prevent spaces
     if (name === 'phone') {
       // Remove spaces as user types
@@ -167,11 +173,12 @@ export default function StudentProfile() {
       errors.push('Name can only contain letters and spaces');
     }
 
-    // Email validation
+    // Email validation - Skip validation since email is read-only and managed by Transfer Account
+    // Email is always provided from authentication and cannot be changed through the form
     if (!info.email || info.email.trim().length === 0) {
-      errors.push('Email is required');
+      errors.push('Email is required (please log in again if missing)');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(info.email.trim())) {
-      errors.push('Please enter a valid email address');
+      errors.push('Invalid email format (contact support if this appears)');
     }
 
     // Phone number validation
@@ -499,15 +506,31 @@ export default function StudentProfile() {
             </div>
             <div className="form-group">
               <label>Email</label>
-              <input
-                type="email"
-                placeholder="Enter email"
-                name="email"
-                value={info.email}
-                onChange={handleChange}
-                className={`gradient-input ${!isEditing ? 'readonly' : ''} ${getFieldValidationClass('email')}`}
-                readOnly={!isEditing}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="email"
+                  placeholder="Enter email"
+                  name="email"
+                  value={info.email}
+                  onChange={handleChange}
+                  className="gradient-input readonly"
+                  readOnly={true}
+                  style={{
+                    cursor: 'not-allowed',
+                    backgroundColor: '#f5f5f5',
+                    color: '#666'
+                  }}
+                />
+                <small style={{
+                  display: 'block',
+                  marginTop: '4px',
+                  color: '#666',
+                  fontSize: '0.8rem',
+                  fontStyle: 'italic'
+                }}>
+                  Email can only be changed through "Transfer Account" below
+                </small>
+              </div>
             </div>
           </div>
 
@@ -532,8 +555,16 @@ export default function StudentProfile() {
           {/* Transfer Account Button */}
           <div className="transfer-account-wrapper" style={{ marginTop: '1.5rem' }}>
             <h3>Transfer Account</h3>
+            <p style={{ 
+              color: '#666', 
+              fontSize: '0.9rem', 
+              marginBottom: '1rem',
+              fontStyle: 'italic'
+            }}>
+              Transfer your Account if you are going to be graduated soon. All your data will be transferred to the new non HEI domain email.
+            </p>
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 const destinationEmail = e.target.elements.destinationEmail.value;
 
@@ -542,8 +573,47 @@ export default function StudentProfile() {
                   return;
                 }
 
-                alert(`Manual transfer initiated from ${info.email} to ${destinationEmail}`);
-                console.log(`Manual transfer: Current Email - ${info.email}, Destination Email - ${destinationEmail}`);
+                if (destinationEmail === info.email) {
+                  alert('New email cannot be the same as current email.');
+                  return;
+                }
+
+                const confirmed = window.confirm(
+                  `Are you sure you want to transfer your account from ${info.email} to ${destinationEmail}? This action cannot be undone.`
+                );
+
+                if (!confirmed) {
+                  return;
+                }
+
+                try {
+                  setSaving(true);
+                  console.log(`Transferring account from ${info.email} to ${destinationEmail}`);
+                  
+                  // Call the transfer API
+                  const updatedProfile = await profileAPI.transferAccount(info.email, destinationEmail);
+                  
+                  // Update local state with new email
+                  setInfo(prev => ({ ...prev, email: destinationEmail }));
+                  
+                  // Update localStorage with new email
+                  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                  userData.email = destinationEmail;
+                  localStorage.setItem('userData', JSON.stringify(userData));
+                  
+                  alert(`Account successfully transferred to ${destinationEmail}. Please log in again with your new email.`);
+                  
+                  // Redirect to login page after a short delay
+                  setTimeout(() => {
+                    window.location.href = '/login';
+                  }, 2000);
+                  
+                } catch (error) {
+                  console.error('Transfer failed:', error);
+                  alert(`Transfer failed: ${error.message || 'Unknown error occurred'}`);
+                } finally {
+                  setSaving(false);
+                }
               }}
             >
               <div style={{ marginBottom: '1rem' }}>
@@ -565,19 +635,20 @@ export default function StudentProfile() {
               </div>
               <button
                 type="submit"
+                disabled={saving}
                 style={{
-                  background: "linear-gradient(90deg,#ff6a00,#ee0979)", // Matched Logout button color
+                  background: saving ? '#ccc' : "linear-gradient(90deg,#ff6a00,#ee0979)", // Matched Logout button color
                   color: 'white',
                   padding: '0.75rem 1.5rem',
                   borderRadius: '8px',
-                  cursor: 'pointer',
+                  cursor: saving ? 'not-allowed' : 'pointer',
                   fontWeight: '600',
                   fontSize: '1rem',
                   width: '100%',
                   border: 'none', // Removed black outline
                 }}
               >
-                Confirm Transfer
+                {saving ? 'Transferring...' : 'Confirm Transfer'}
               </button>
             </form>
           </div>

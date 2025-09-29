@@ -326,8 +326,8 @@ export default function Internships() {
                 setFormData({ ...formData, description: e.target.value })
               }
               style={{
-                minHeight: "80px",
-                maxHeight: "80px",
+                minHeight: "120px",
+                maxHeight: "120px",
                 resize: "none",
                 borderRadius: "8px",
                 padding: "0.7rem 1rem",

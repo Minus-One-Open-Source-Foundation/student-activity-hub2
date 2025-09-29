@@ -380,6 +380,33 @@ export const profileAPI = {
       }
       throw error;
     }
+  },
+
+  // Transfer account (update email)
+  transferAccount: async (currentEmail, newEmail) => {
+    try {
+      console.log('Transferring account from:', currentEmail, 'to:', newEmail);
+      
+      const encodedCurrentEmail = encodeURIComponent(currentEmail);
+      const response = await api.put(`/profile/user/${encodedCurrentEmail}/transfer-email`, {
+        newEmail: newEmail
+      });
+      console.log('Account transfer response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to transfer account:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      if (error.response?.status === 404) {
+        throw new Error('Current user not found.');
+      } else if (error.response?.status === 400) {
+        throw new Error('Invalid email format or email already exists.');
+      } else if (error.response?.status === 409) {
+        throw new Error('The new email address is already in use.');
+      }
+      throw error;
+    }
   }
 };
 
