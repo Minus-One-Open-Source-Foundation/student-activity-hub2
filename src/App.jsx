@@ -25,6 +25,7 @@ import StudentManagement from "./pages/StudentManagement";
 import GradeManagement from "./pages/GradeManagement";
 import Reports from "./pages/Reports";
 import FacultyInternshipsRequests from "./pages/FacultyInternshipsRequests";
+import AchievementsRequest from "./pages/AchievementsRequest";
 
 function App() {
   const { user } = useAuth();
@@ -67,6 +68,7 @@ function App() {
             <Route path="/faculty/grades" element={<GradeManagement />} />
             <Route path="/faculty/reports" element={<Reports />} />
             <Route path="/faculty/internships-requests" element={<FacultyInternshipsRequests />} />
+            <Route path="/faculty/achievements-requests" element={<AchievementsRequest />} />
             <Route path="/faculty/analytics" element={<div>Faculty Analytics</div>} />
             <Route path="*" element={<Navigate to="/faculty" replace />} />
           </Routes>

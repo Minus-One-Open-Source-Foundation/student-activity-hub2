@@ -7,10 +7,11 @@ const api = axios.create({
 // Add token to requests if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  console.log('API Request:', {
+  console.log('🚀 API Request:', {
     url: config.url,
     method: config.method,
     baseURL: config.baseURL,
+    fullURL: config.baseURL + config.url,
     hasToken: !!token,
     tokenPrefix: token ? token.substring(0, 20) + '...' : 'None'
   });
@@ -432,6 +433,31 @@ export const facultyAPI = {
   rejectInternship: async (id) => {
     const response = await api.put(`/faculty/internships/${id}/reject`);
     return response.data;
+  },
+
+  // Achievement management endpoints for faculty
+  // Get all pending achievements for faculty review
+  getPendingAchievements: async () => {
+    const response = await api.get('/achievements/faculty/pending');
+    return response.data;
+  },
+
+  // Get all achievements with their status
+  getAllAchievementsForFaculty: async () => {
+    const response = await api.get('/achievements/faculty/all');
+    return response.data;
+  },
+
+  // Approve an achievement
+  approveAchievement: async (id) => {
+    const response = await api.put(`/achievements/faculty/${id}/approve`);
+    return response.data;
+  },
+
+  // Reject an achievement
+  rejectAchievement: async (id) => {
+    const response = await api.put(`/achievements/faculty/${id}/reject`);
+    return response.data;
   }
 };
 
@@ -456,6 +482,107 @@ export const internshipAPI = {
   // Get internship by ID
   getInternshipById: async (id, userEmail) => {
     const response = await api.get(`/internships/${id}/user/${encodeURIComponent(userEmail)}`);
+    return response.data;
+  }
+};
+
+// Achievements API - matches your AchievementController
+export const achievementAPI = {
+  // Test connection to achievements endpoint
+  testConnection: async () => {
+    try {
+      const response = await api.get('/achievements/faculty/all');
+      console.log('Backend connection test successful');
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Backend connection test failed:', error);
+      return { success: false, error };
+    }
+  },
+
+  // Create a new achievement
+  createAchievement: async (formData) => {
+    const response = await api.post('/achievements/create', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Get user achievements
+  getUserAchievements: async (userEmail) => {
+    console.log('Making API call to get user achievements for:', userEmail);
+    const response = await api.get(`/achievements/user/${encodeURIComponent(userEmail)}`);
+    return response.data;
+  },
+
+  // Get achievement by ID
+  getAchievementById: async (id, userEmail) => {
+    const response = await api.get(`/achievements/${id}/user/${encodeURIComponent(userEmail)}`);
+    return response.data;
+  },
+
+  // Delete achievement
+  deleteAchievement: async (id, userEmail) => {
+    const response = await api.delete(`/achievements/${id}/user/${encodeURIComponent(userEmail)}`);
+    return response.data;
+  },
+
+  // Faculty endpoints
+  getPendingAchievements: async () => {
+    const response = await api.get('/achievements/faculty/pending');
+    return response.data;
+  },
+
+  getAllForFaculty: async () => {
+    console.log('📥 Fetching all achievements for faculty review...');
+    console.log('🔗 Making request to: /achievements/faculty/all');
+    try {
+      const response = await api.get('/achievements/faculty/all');
+      console.log('✅ Faculty achievements API response:', response.data);
+      // Backend returns List<AchievementResponse> directly
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('❌ Faculty achievements API error:', error);
+      throw error;
+    }
+  },
+
+  updateStatus: async (id, status) => {
+    console.log(`🔄 Updating achievement ${id} status to ${status}`);
+    try {
+      const response = await api.put(`/achievements/faculty/${id}/status`, null, {
+        params: { status }
+      });
+      console.log('✅ Status update response:', response.data);
+      return { success: response.data.success, data: response.data };
+    } catch (error) {
+      console.error('❌ Status update error:', error);
+      throw error;
+    }
+  },
+
+  // Legacy endpoints (kept for compatibility)
+  getAllAchievements: async () => {
+    const response = await api.get('/achievements/faculty/all');
+    return response.data;
+  },
+
+  approveAchievement: async (id) => {
+    const response = await api.put(`/achievements/faculty/${id}/approve`);
+    return response.data;
+  },
+
+  rejectAchievement: async (id) => {
+    const response = await api.put(`/achievements/faculty/${id}/reject`);
+    return response.data;
+  },
+
+  updateAchievementStatus: async (id, status) => {
+    const response = await api.put(`/achievements/faculty/${id}/status`, null, {
+      params: { status }
+    });
     return response.data;
   }
 };

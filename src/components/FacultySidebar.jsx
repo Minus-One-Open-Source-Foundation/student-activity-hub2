@@ -28,6 +28,7 @@ export default function FacultySidebar({ open = false, onClose }) {
     { to: "/faculty", label: "Dashboard" },
     { to: "/faculty/reports", label: "Hackathons And Workshops Requests" },
     { to: "/faculty/internships-requests", label: "Internships Requests" },
+    { to: "/faculty/achievements-requests", label: "Achievements Requests" },
     { to: "/faculty/extra-activities", label: "Co-curriculars Requests" },
     { to: "/faculty/students", label: "Student Management" },
     { to: "/faculty/grades", label: "Grade Management" },
