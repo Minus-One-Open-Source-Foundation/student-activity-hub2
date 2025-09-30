@@ -6,7 +6,8 @@ import {
   FaFileAlt, 
   FaSpinner,
   FaCheck, 
-  FaTimes 
+  FaTimes,
+  FaEye
 } from "react-icons/fa";
 import { facultyAPI } from "../services/api";
 
@@ -17,6 +18,8 @@ export default function FacultyInternshipsRequests() {
   const [processingId, setProcessingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("PENDING");
+  const [showCertificateViewer, setShowCertificateViewer] = useState(false);
+  const [viewingCertificate, setViewingCertificate] = useState(null);
 
   // Filter options
   const filterOptions = [
@@ -107,6 +110,24 @@ export default function FacultyInternshipsRequests() {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const handleViewCertificate = (event) => {
+    if (event.certificateUrl) {
+      setViewingCertificate({
+        url: event.certificateUrl,
+        filename: event.certificateFilename || 'Certificate',
+        studentName: event.studentName,
+        companyName: event.companyName,
+        title: event.title
+      });
+      setShowCertificateViewer(true);
+    }
+  };
+
+  const closeCertificateViewer = () => {
+    setShowCertificateViewer(false);
+    setViewingCertificate(null);
   };
   const filteredEvents = events.filter((ev) =>
     ev.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -257,9 +278,34 @@ export default function FacultyInternshipsRequests() {
                     </p>
                   )}
                   {event.certificateFilename && (
-                    <p style={{ color: "#666", fontSize: "0.9rem", marginBottom: "0.7rem" }}>
-                      <strong>Certificate:</strong> {event.certificateFilename}
-                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: "0.7rem" }}>
+                      <p style={{ color: "#666", fontSize: "0.9rem", margin: 0 }}>
+                        <strong>Certificate:</strong> {event.certificateFilename}
+                      </p>
+                      {event.certificateUrl && (
+                        <button
+                          onClick={() => handleViewCertificate(event)}
+                          style={{
+                            background: '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '0.3rem 0.5rem',
+                            cursor: 'pointer',
+                            fontSize: '0.8rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseOver={(e) => e.target.style.background = '#2563eb'}
+                          onMouseOut={(e) => e.target.style.background = '#3b82f6'}
+                          title="View Certificate"
+                        >
+                          <FaEye /> View
+                        </button>
+                      )}
+                    </div>
                   )}
                   <p style={{ color: "#888", fontSize: "0.85rem" }}>
                     <strong>Submitted:</strong> {formatDate(event.createdAt)}
@@ -446,6 +492,131 @@ export default function FacultyInternshipsRequests() {
           ))
         )}
       </section>
+
+      {/* Certificate Viewer Modal */}
+      {showCertificateViewer && viewingCertificate && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: '80px',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem'
+          }}
+          onClick={closeCertificateViewer}
+        >
+          <div 
+            className="certificate-modal"
+            style={{
+              width: '90vw',
+              height: 'calc(100vh - 120px)',
+              maxWidth: '1200px',
+              maxHeight: '800px',
+              background: 'white',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              margin: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="certificate-header" style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '1.5rem 2rem',
+              background: '#f8fafc',
+              borderBottom: '1px solid #e2e8f0'
+            }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600, color: '#1e293b' }}>
+                  Certificate - {viewingCertificate.title}
+                </h3>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>
+                  {viewingCertificate.studentName} • {viewingCertificate.companyName}
+                </p>
+              </div>
+              <button
+                onClick={closeCertificateViewer}
+                style={{
+                  background: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '0.75rem',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = '#dc2626';
+                  e.target.style.transform = 'scale(1.05)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = '#ef4444';
+                  e.target.style.transform = 'scale(1)';
+                }}
+                title="Close"
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* Certificate Content */}
+            <div className="certificate-content" style={{
+              flex: 1,
+              padding: '1rem',
+              background: '#f1f5f9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'auto',
+              minHeight: 0
+            }}>
+              <div style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <img
+                  className="certificate-image"
+                  src={viewingCertificate.url}
+                  alt={viewingCertificate.filename}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onLoad={(e) => {
+                    // Ensure the image is fully visible after loading
+                    console.log('Certificate loaded:', e.target.naturalWidth, 'x', e.target.naturalHeight);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .approved { color: #10b981; }
         .pending { color: #ff4b5c; }
@@ -455,6 +626,46 @@ export default function FacultyInternshipsRequests() {
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+
+        /* Certificate Viewer Responsive Styles */
+        @media (max-width: 768px) {
+          .certificate-modal {
+            width: 95vw !important;
+            height: calc(100vh - 140px) !important;
+            margin: 0 !important;
+          }
+          
+          .certificate-header {
+            padding: 1rem !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1rem !important;
+          }
+          
+          .certificate-content {
+            padding: 0.5rem !important;
+          }
+          
+          .certificate-image {
+            border-radius: 4px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .certificate-modal {
+            border-radius: 8px !important;
+            height: calc(100vh - 160px) !important;
+            width: 98vw !important;
+          }
+          
+          .certificate-header h3 {
+            font-size: 1rem !important;
+          }
+          
+          .certificate-header p {
+            font-size: 0.75rem !important;
+          }
         }
       `}</style>
     </div>

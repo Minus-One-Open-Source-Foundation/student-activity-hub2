@@ -308,70 +308,175 @@ export default function URMS() {
         </button>
       </div>
 
-      {/* Upload Form Modal */}
+      {/* Enhanced Upload Form Modal */}
       {showUploadForm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Upload Resume</h3>
-            <form onSubmit={handleUpload}>
-              <div className="form-group">
-                <label>Role/Position:</label>
-                <select
-                  value={uploadForm.isCustomRole ? 'custom' : uploadForm.role}
-                  onChange={(e) => {
-                    if (e.target.value === 'custom') {
-                      setUploadForm({...uploadForm, isCustomRole: true, role: ''});
-                    } else {
-                      setUploadForm({...uploadForm, isCustomRole: false, role: e.target.value, customRole: ''});
-                    }
-                  }}
-                  required
-                >
-                  <option value="">Select a role</option>
-                  {predefinedRoles.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                  <option value="custom">Custom Role</option>
-                </select>
-                
-                {uploadForm.isCustomRole && (
-                  <input
-                    type="text"
-                    placeholder="Enter custom role/position"
-                    value={uploadForm.customRole}
-                    onChange={(e) => setUploadForm({...uploadForm, customRole: e.target.value, role: e.target.value})}
-                    required
-                    style={{ marginTop: '10px' }}
-                  />
-                )}
-              </div>
-              
-              <div className="form-group">
-                <label>Resume (PDF only):</label>
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileSelect}
-                  required
-                />
-                {uploadForm.file && (
-                  <div className="file-info">
-                    <FaFilePdf /> {uploadForm.file.name} ({formatFileSize(uploadForm.file.size)})
+        <div className="modal-overlay" onClick={() => setShowUploadForm(false)}>
+          <div className="enhanced-upload-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="upload-header">
+              <h3>Upload New Resume</h3>
+              <p>Add a role-specific resume to your portfolio</p>
+            </div>
+            
+            <form onSubmit={handleUpload} className="enhanced-form">
+              <div className="form-step">
+                <div className="step-number">1</div>
+                <div className="step-content">
+                  <div className="form-group enhanced">
+                    <label>
+                      <span className="label-text">Target Role/Position</span>
+                      <span className="label-required">*</span>
+                    </label>
+                    <div className="select-wrapper">
+                      <select
+                        value={uploadForm.isCustomRole ? 'custom' : uploadForm.role}
+                        onChange={(e) => {
+                          if (e.target.value === 'custom') {
+                            setUploadForm({...uploadForm, isCustomRole: true, role: ''});
+                          } else {
+                            setUploadForm({...uploadForm, isCustomRole: false, role: e.target.value, customRole: ''});
+                          }
+                        }}
+                        required
+                        className="enhanced-select"
+                      >
+                        <option value="">Choose your target role...</option>
+                        <optgroup label="🚀 Engineering">
+                          <option value="Software Development Engineer (SDE)">Software Development Engineer (SDE)</option>
+                          <option value="Software Development Engineer in Test (SDET)">Software Development Engineer in Test (SDET)</option>
+                          <option value="Frontend Developer">Frontend Developer</option>
+                          <option value="Backend Developer">Backend Developer</option>
+                          <option value="Full Stack Developer">Full Stack Developer</option>
+                          <option value="DevOps Engineer">DevOps Engineer</option>
+                        </optgroup>
+                        <optgroup label="📊 Data & Analytics">
+                          <option value="Data Analyst">Data Analyst</option>
+                          <option value="Data Scientist">Data Scientist</option>
+                          <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                        </optgroup>
+                        <optgroup label="🎨 Design & Product">
+                          <option value="UI/UX Designer">UI/UX Designer</option>
+                          <option value="Product Manager">Product Manager</option>
+                        </optgroup>
+                        <optgroup label="💼 Business & Marketing">
+                          <option value="Business Analyst">Business Analyst</option>
+                          <option value="Sales Executive">Sales Executive</option>
+                          <option value="Marketing Analyst">Marketing Analyst</option>
+                        </optgroup>
+                        <optgroup label="🔧 Other Roles">
+                          <option value="Quality Assurance Engineer">Quality Assurance Engineer</option>
+                          <option value="Technical Writer">Technical Writer</option>
+                          <option value="Financial Analyst">Financial Analyst</option>
+                          <option value="Human Resources Specialist">Human Resources Specialist</option>
+                          <option value="Consultant">Consultant</option>
+                          <option value="Research Analyst">Research Analyst</option>
+                        </optgroup>
+                        <option value="custom">✏️ Custom Role (Type your own)</option>
+                      </select>
+                    </div>
+                    
+                    {uploadForm.isCustomRole && (
+                      <div className="custom-role-input">
+                        <input
+                          type="text"
+                          placeholder="e.g., Machine Learning Intern, Cloud Architect..."
+                          value={uploadForm.customRole}
+                          onChange={(e) => setUploadForm({...uploadForm, customRole: e.target.value, role: e.target.value})}
+                          required
+                          className="enhanced-input"
+                        />
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
 
-              <div className="form-actions">
-                <button type="button" onClick={() => {
-                  setShowUploadForm(false);
-                  setUploadForm({ role: '', customRole: '', isCustomRole: false, file: null });
-                }}>
+              <div className="form-step">
+                <div className="step-number">2</div>
+                <div className="step-content">
+                  <div className="form-group enhanced">
+                    <label>
+                      <span className="label-text">Resume Document</span>
+                      <span className="label-required">*</span>
+                      <span className="label-hint">PDF format, max 10MB</span>
+                    </label>
+                    
+                    <div className="file-upload-area" 
+                         onDrop={(e) => {
+                           e.preventDefault();
+                           const files = e.dataTransfer.files;
+                           if (files[0]) handleFileSelect({target: {files}});
+                         }}
+                         onDragOver={(e) => e.preventDefault()}
+                         onDragEnter={(e) => e.preventDefault()}>
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleFileSelect}
+                        required
+                        id="resume-file"
+                        className="file-input-hidden"
+                      />
+                      
+                      {!uploadForm.file ? (
+                        <label htmlFor="resume-file" className="file-upload-label">
+                          <div className="upload-icon">
+                            <FaFilePdf />
+                          </div>
+                          <div className="upload-text">
+                            <span className="upload-primary">Click to select or drag & drop</span>
+                            <span className="upload-secondary">PDF files only, up to 10MB</span>
+                          </div>
+                        </label>
+                      ) : (
+                        <div className="file-selected">
+                          <div className="file-icon">
+                            <FaFilePdf />
+                          </div>
+                          <div className="file-details">
+                            <span className="file-name">{uploadForm.file.name}</span>
+                            <span className="file-size">{formatFileSize(uploadForm.file.size)}</span>
+                          </div>
+                          <button 
+                            type="button" 
+                            className="file-remove"
+                            onClick={() => setUploadForm({...uploadForm, file: null})}
+                          >
+                            <FaTimes />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-actions enhanced">
+                <button 
+                  type="button" 
+                  className="btn-secondary"
+                  onClick={() => {
+                    setShowUploadForm(false);
+                    setUploadForm({ role: '', customRole: '', isCustomRole: false, file: null });
+                  }}
+                >
                   Cancel
                 </button>
-                <button type="submit" disabled={uploading}>
-                  {uploading ? 'Uploading...' : 'Upload Resume'}
+                <button 
+                  type="submit" 
+                  disabled={uploading || !uploadForm.file || !uploadForm.role}
+                  className="btn-primary"
+                >
+                  {uploading ? (
+                    <>
+                      <div className="spinner"></div>
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <FaUpload />
+                      Upload Resume
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -658,15 +763,18 @@ export default function URMS() {
           font-size: 1.5rem;
         }
 
-        .form-group {
-          margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 600;
-          color: #374151;
+        .enhanced-upload-modal {
+          background: #fff;
+          border-radius: 16px;
+          width: 90%;
+          max-width: 580px;
+          max-height: 90vh;
+          overflow: hidden;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          position: relative;
+          z-index: 1100;
+          display: flex;
+          flex-direction: column;
         }
 
         .form-group input {
@@ -1200,6 +1308,574 @@ export default function URMS() {
           gap: 0.5rem;
         }
 
+        /* Enhanced Upload Form Styles */
+        .upload-header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 2rem;
+          text-align: center;
+          border-radius: 16px 16px 0 0;
+        }
+
+        .upload-header h3 {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.75rem;
+          font-weight: 700;
+        }
+
+        .upload-header p {
+          margin: 0;
+          opacity: 0.9;
+          font-size: 1rem;
+        }
+
+        .upload-body {
+          padding: 0;
+        }
+
+        .enhanced-form {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+          padding: 2rem;
+        }
+
+        .form-step {
+          display: flex;
+          align-items: flex-start;
+          gap: 1rem;
+          margin-bottom: 2rem;
+        }
+
+        .step-content {
+          flex: 1;
+        }
+
+        .form-group.enhanced {
+          margin-bottom: 0;
+        }
+
+        .form-group.enhanced label {
+          display: block;
+          margin-bottom: 0.75rem;
+          font-weight: 600;
+          color: #1e293b;
+        }
+
+        .label-text {
+          font-size: 1rem;
+        }
+
+        .label-required {
+          color: #ef4444;
+          margin-left: 0.25rem;
+        }
+
+        .label-hint {
+          font-size: 0.875rem;
+          color: #64748b;
+          font-weight: 400;
+          margin-left: 0.5rem;
+        }
+
+        .select-wrapper {
+          position: relative;
+        }
+
+        .enhanced-select {
+          width: 100%;
+          padding: 0.875rem 1rem;
+          border: 2px solid #e2e8f0;
+          border-radius: 10px;
+          font-size: 1rem;
+          background: white;
+          color: #1e293b;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+          background-position: right 0.75rem center;
+          background-repeat: no-repeat;
+          background-size: 1.25rem;
+          padding-right: 3rem;
+        }
+
+        .enhanced-select:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .custom-role-input {
+          margin-top: 0.75rem;
+        }
+
+        .enhanced-input {
+          width: 100%;
+          padding: 0.875rem 1rem;
+          border: 2px solid #e2e8f0;
+          border-radius: 10px;
+          font-size: 1rem;
+          transition: all 0.2s ease;
+        }
+
+        .enhanced-input:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload-label {
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          width: 100%;
+        }
+
+        .upload-icon {
+          font-size: 3rem;
+          color: #9ca3af;
+          transition: color 0.3s ease;
+        }
+
+        .file-upload-area:hover .upload-icon {
+          color: #667eea;
+        }
+
+        .upload-text {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          text-align: center;
+        }
+
+        .upload-primary {
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: #374151;
+        }
+
+        .upload-secondary {
+          font-size: 0.9rem;
+          color: #6b7280;
+        }
+
+        .file-selected {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1.25rem;
+          background: #f0f9ff;
+          border: 2px solid #bae6fd;
+          border-radius: 12px;
+          width: 100%;
+        }
+
+        .file-icon {
+          font-size: 2.5rem;
+          color: #0ea5e9;
+          flex-shrink: 0;
+        }
+
+        .file-details {
+          flex: 1;
+          text-align: left;
+        }
+
+        .file-name {
+          display: block;
+          font-weight: 600;
+          color: #0c4a6e;
+          margin-bottom: 0.25rem;
+          font-size: 1rem;
+        }
+
+        .file-size {
+          display: block;
+          font-size: 0.875rem;
+          color: #0369a1;
+        }
+
+        .file-remove {
+          background: #ef4444;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+
+        .file-remove:hover {
+          background: #dc2626;
+          transform: scale(1.1);
+        }
+
+        .form-actions.enhanced {
+          display: flex;
+          gap: 1rem;
+          justify-content: flex-end;
+          padding: 1.5rem 2rem;
+          background: #f8fafc;
+          margin: 1.5rem -2rem 0;
+          border-top: 1px solid #e2e8f0;
+          border-radius: 0 0 16px 16px;
+        }
+
+        .form-actions.enhanced button {
+          padding: 0.875rem 2rem;
+          border-radius: 10px;
+          font-weight: 600;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          border: none;
+        }
+
+        .btn-secondary {
+          background: #f1f5f9;
+          color: #64748b;
+          border: 2px solid #e2e8f0 !important;
+        }
+
+        .btn-secondary:hover {
+          background: #e2e8f0;
+          color: #475569;
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+
+        .spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-left: 2px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        .upload-step {
+          margin-bottom: 2rem;
+          position: relative;
+        }
+
+        .step-header {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
+        }
+
+        .step-number {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 1rem;
+          flex-shrink: 0;
+          margin-top: 0.25rem;
+        }
+
+        .step-title {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #1e293b;
+          margin: 0;
+        }
+
+        .role-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1rem;
+        }
+
+        .role-group {
+          border: 2px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 1rem;
+          transition: all 0.2s ease;
+          cursor: pointer;
+          background: white;
+        }
+
+        .role-group:hover {
+          border-color: #667eea;
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .role-group.selected {
+          border-color: #667eea;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        }
+
+        .role-group-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .role-emoji {
+          font-size: 1.5rem;
+        }
+
+        .role-category {
+          font-weight: 600;
+          color: #1e293b;
+          font-size: 0.9rem;
+        }
+
+        .role-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .role-tag {
+          padding: 0.25rem 0.75rem;
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          color: #64748b;
+          transition: all 0.2s ease;
+        }
+
+        .role-group.selected .role-tag {
+          background: #667eea;
+          color: white;
+          border-color: #667eea;
+        }
+
+        .file-upload-area {
+          border: 3px dashed #cbd5e1;
+          border-radius: 12px;
+          padding: 2.5rem 2rem;
+          text-align: center;
+          background: #f8fafc;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          position: relative;
+          min-height: 140px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .file-upload-area:hover,
+        .file-upload-area.drag-active {
+          border-color: #667eea;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .file-upload-icon {
+          font-size: 3rem;
+          color: #9ca3af;
+          margin-bottom: 1rem;
+          transition: color 0.3s ease;
+        }
+
+        .file-upload-area:hover .file-upload-icon,
+        .file-upload-area.drag-active .file-upload-icon {
+          color: #667eea;
+        }
+
+        .file-upload-text {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #374151;
+        }
+
+        .file-upload-subtext {
+          margin: 0;
+          font-size: 0.9rem;
+          color: #6b7280;
+        }
+
+        .file-input-hidden {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .selected-file {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem;
+          background: #f0f9ff;
+          border: 1px solid #bae6fd;
+          border-radius: 8px;
+          margin-top: 1rem;
+        }
+
+        .file-icon {
+          font-size: 2rem;
+          color: #0ea5e9;
+        }
+
+        .file-details {
+          flex: 1;
+        }
+
+        .file-name {
+          font-weight: 600;
+          color: #0c4a6e;
+          margin: 0 0 0.25rem 0;
+        }
+
+        .file-size {
+          font-size: 0.875rem;
+          color: #0369a1;
+          margin: 0;
+        }
+
+        .remove-file-btn {
+          background: #ef4444;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .remove-file-btn:hover {
+          background: #dc2626;
+          transform: scale(1.1);
+        }
+
+        .enhanced-form-actions {
+          display: flex;
+          gap: 1rem;
+          justify-content: flex-end;
+          padding-top: 1.5rem;
+          border-top: 1px solid #e2e8f0;
+          margin-top: 2rem;
+        }
+
+        .enhanced-form-actions button {
+          padding: 0.875rem 2rem;
+          border-radius: 10px;
+          font-weight: 600;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .enhanced-form-actions .cancel-btn {
+          background: #f8fafc;
+          color: #64748b;
+          border: 2px solid #e2e8f0;
+        }
+
+        .enhanced-form-actions .cancel-btn:hover {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+        }
+
+        .enhanced-form-actions .submit-btn {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.3);
+        }
+
+        .enhanced-form-actions .submit-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.4);
+        }
+
+        .enhanced-form-actions .submit-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+
+        .loading-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(255, 255, 255, 0.95);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border-radius: 16px;
+          z-index: 10;
+        }
+
+        .loading-content {
+          text-align: center;
+        }
+
+        .loading-spinner-large {
+          width: 50px;
+          height: 50px;
+          border: 4px solid #e5e7eb;
+          border-left: 4px solid #667eea;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-bottom: 1rem;
+        }
+
+        .loading-text {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #374151;
+          margin: 0;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
           .resumes-grid {
             grid-template-columns: 1fr;
@@ -1211,6 +1887,44 @@ export default function URMS() {
           
           .modal-content {
             margin: 1rem;
+          }
+
+          .enhanced-upload-modal {
+            width: 95%;
+            max-height: 90vh;
+          }
+
+          .upload-header {
+            padding: 1.5rem;
+          }
+
+          .upload-header h3 {
+            font-size: 1.5rem;
+          }
+
+          .upload-body {
+            padding: 1.5rem;
+          }
+
+          .role-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .file-upload-area {
+            padding: 1.5rem;
+          }
+
+          .file-upload-icon {
+            font-size: 2.5rem;
+          }
+
+          .enhanced-form-actions {
+            flex-direction: column;
+          }
+
+          .enhanced-form-actions button {
+            width: 100%;
+            justify-content: center;
           }
 
           .resume-viewer-modal {
