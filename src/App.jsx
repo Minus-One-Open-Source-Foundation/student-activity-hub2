@@ -8,7 +8,7 @@ import FacultyLayout from "./components/FacultyLayout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
-// Soltudent Pages
+// Student Pages
 import Dashboard from "./pages/Dashboard";
 import PersonalInfo from "./pages/PersonalInfo";
 import Activities from "./pages/Activities";

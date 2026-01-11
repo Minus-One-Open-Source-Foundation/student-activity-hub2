@@ -1,7 +1,14 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, // Spring Boot backend
+  baseURL: (() => {
+    let url = import.meta.env.VITE_API_URL;
+    if (!url) return 'http://localhost:8080/api';
+    if (!url.endsWith('/api')) {
+      return url.endsWith('/') ? `${url}api` : `${url}/api`;
+    }
+    return url;
+  })(), // Spring Boot backend
 });
 
 // Add token to requests if available
@@ -123,7 +130,14 @@ export const authAPI = {
 
 // File upload API (for blob storage)
 const fileAPI = axios.create({
-  baseURL: import.meta.env.VITE_API_URL.replace('/api/', '/'), // No /api prefix for file endpoints
+  baseURL: (() => {
+    let url = import.meta.env.VITE_API_URL;
+    if (!url) return 'http://localhost:8080/api';
+    if (!url.endsWith('/api')) {
+      return url.endsWith('/') ? `${url}api` : `${url}/api`;
+    }
+    return url;
+  })(), // Ensure /api prefix for file endpoints too
 });
 
 // Add token to file requests if available
