@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://98.70.26.80:8058/api/", // Spring Boot backend
+  baseURL: import.meta.env.VITE_API_URL, // Spring Boot backend
 });
 
 // Add token to requests if available
@@ -123,7 +123,7 @@ export const authAPI = {
 
 // File upload API (for blob storage)
 const fileAPI = axios.create({
-  baseURL: "http://98.70.26.80:8058/", // No /api prefix for file endpoints
+  baseURL: import.meta.env.VITE_API_URL.replace('/api/', '/'), // No /api prefix for file endpoints
 });
 
 // Add token to file requests if available
