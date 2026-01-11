@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { profileAPI } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import bgImage from "../assets/bg.jpg";
 
 export default function StudentProfile() {
   const { user } = useAuth();
@@ -694,7 +695,7 @@ export default function StudentProfile() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background: url('${bgImage}') no-repeat center center fixed;
           background-size: cover;
           font-family: "Inter", system-ui, sans-serif;
           color: var(--text-dark);
@@ -872,7 +873,7 @@ export default function StudentProfile() {
           min-height: 100vh;
           padding: 2rem;
           font-family: 'Inter', sans-serif;
-          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background: url('${bgImage}') no-repeat center center fixed;
           background-size: cover;
           display: flex;
           justify-content: center;

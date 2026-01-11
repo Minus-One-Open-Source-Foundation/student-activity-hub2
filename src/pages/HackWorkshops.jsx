@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaPlus, FaSearch, FaCheckCircle, FaExclamationCircle, FaFileAlt } from "react-icons/fa";
 import { eventsAPI } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import bgImage from "../assets/bg.jpg";
 
 export default function HackWorkshops() {
   const { user } = useAuth();
@@ -402,7 +403,7 @@ export default function HackWorkshops() {
           min-height: 100vh;
           padding: 2rem 1rem;
           font-family: 'Inter', sans-serif;
-          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background: url('${bgImage}') no-repeat center center fixed;
           background-size: cover;
           color: #111;
         }

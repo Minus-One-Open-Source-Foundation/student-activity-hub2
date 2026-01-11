@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import bgImage from "../assets/bg.jpg";
 
 export default function Activities() {
   const [activities, setActivities] = useState([]);
@@ -140,7 +141,7 @@ export default function Activities() {
         .activities-wrapper {
           min-height: 100vh;
           padding: 3rem 2rem;
-          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background: url('${bgImage}') no-repeat center center fixed;
           background-size: cover;
           font-family: 'Inter', sans-serif;
           color: #333;

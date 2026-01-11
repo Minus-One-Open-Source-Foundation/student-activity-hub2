@@ -10,6 +10,7 @@ import {
   FaEye
 } from "react-icons/fa";
 import { facultyAPI } from "../services/api";
+import bgImage from "../assets/bg.jpg";
 
 export default function FacultyInternshipsRequests() {
   const [events, setEvents] = useState([]);
@@ -136,7 +137,7 @@ export default function FacultyInternshipsRequests() {
 
   if (loading) {
     return (
-      <div className="internships-requests-wrapper" style={{ minHeight: "100vh", padding: "2rem 1rem", fontFamily: "'Inter', sans-serif", background: `url('/src/assets/bg.jpg') no-repeat center center fixed`, backgroundSize: "cover", color: "#111" }}>
+      <div className="internships-requests-wrapper" style={{ minHeight: "100vh", padding: "2rem 1rem", fontFamily: "'Inter', sans-serif", background: `url('${bgImage}') no-repeat center center fixed`, backgroundSize: "cover", color: "#111" }}>
         <div style={{ textAlign: "center", padding: "3rem" }}>
           <FaSpinner className="spinner" style={{ fontSize: "2rem", color: "#007bff" }} />
           <p>Loading internship requests...</p>
@@ -147,7 +148,7 @@ export default function FacultyInternshipsRequests() {
 
   if (error) {
     return (
-      <div className="internships-requests-wrapper" style={{ minHeight: "100vh", padding: "2rem 1rem", fontFamily: "'Inter', sans-serif", background: `url('/src/assets/bg.jpg') no-repeat center center fixed`, backgroundSize: "cover", color: "#111" }}>
+      <div className="internships-requests-wrapper" style={{ minHeight: "100vh", padding: "2rem 1rem", fontFamily: "'Inter', sans-serif", background: `url('${bgImage}') no-repeat center center fixed`, backgroundSize: "cover", color: "#111" }}>
         <div style={{ textAlign: "center", padding: "3rem", background: "rgba(255,255,255,0.9)", borderRadius: "8px", margin: "2rem auto", maxWidth: "500px" }}>
           <p style={{ color: "#dc3545", fontSize: "1.1rem", marginBottom: "1rem" }}>{error}</p>
           <button onClick={fetchInternshipRequests} style={{ padding: "0.5rem 1rem", background: "#007bff", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
@@ -159,7 +160,7 @@ export default function FacultyInternshipsRequests() {
   }
 
   return (
-    <div className="internships-requests-wrapper" style={{ minHeight: "100vh", padding: "2rem 1rem", fontFamily: "'Inter', sans-serif", background: `url('/src/assets/bg.jpg') no-repeat center center fixed`, backgroundSize: "cover", color: "#111" }}>
+    <div className="internships-requests-wrapper" style={{ minHeight: "100vh", padding: "2rem 1rem", fontFamily: "'Inter', sans-serif", background: `url('${bgImage}') no-repeat center center fixed`, backgroundSize: "cover", color: "#111" }}>
       <header style={{ textAlign: "center", marginBottom: "2.5rem", marginTop: "2.5rem" }}>
         <div className="search-bar-wrapper">
             <h2 style={{ fontWeight: 700, fontSize: '2.1rem', color: '#3a3aee', marginBottom: '1.5rem' }}>Internship Requests</h2>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaTrophy, FaCheckCircle, FaExclamationCircle, FaFileAlt, FaSpinner, FaTimes } from "react-icons/fa";
 import { achievementAPI } from "../services/api";
+import bgImage from "../assets/bg.jpg";
 
 export default function Achievements() {
   console.log('🎯 Achievements component initialized');
@@ -467,7 +468,7 @@ export default function Achievements() {
 
       {/* Styles */}
       <style>{`
-        .achievements-wrapper { min-height: 100vh; padding: 3rem 2rem; background: url("/src/assets/bg.jpg") no-repeat center center fixed; background-size: cover; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; }
+        .achievements-wrapper { min-height: 100vh; padding: 3rem 2rem; background: url('${bgImage}') no-repeat center center fixed; background-size: cover; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; }
         h1 { font-size: 2rem; font-weight: 700; color: #000; margin-bottom: 0.5rem; }
         p { color: #555; margin-bottom: 1.5rem; text-align: center; }
 

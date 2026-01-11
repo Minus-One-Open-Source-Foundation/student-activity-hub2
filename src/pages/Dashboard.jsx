@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import bgImage from "../assets/bg.jpg";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -119,7 +120,7 @@ export default function Dashboard() {
           height: 100vh;
           font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
           color:#111;
-          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background: url('${bgImage}') no-repeat center center fixed;
           background-size: cover;
           display: flex;
           flex-direction: column;

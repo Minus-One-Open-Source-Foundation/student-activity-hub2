@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import bgImage from "../assets/bg.jpg";
 
 export default function Register() {
   const { register } = useAuth();
@@ -226,7 +227,7 @@ export default function Register() {
           font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 
           /* Background image + animated gradient overlay */
-          background: url("/src/assets/bg.jpg") center/cover no-repeat,
+          background: url("${bgImage}") center/cover no-repeat,
                       linear-gradient(270deg, #8ec5fc, #e0c3fc, #f0f4f8, #cfd9df);
           background-size: cover, 800% 800%;
           background-blend-mode: overlay;

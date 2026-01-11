@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import FacultySidebar from "./FacultySidebar";
 import Navbar from "./Navbar";
+import bgImage from "../assets/bg.jpg";
 
 export default function FacultyLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -44,7 +45,7 @@ export default function FacultyLayout({ children }) {
           overflow-y: auto;
           min-height: 100vh;
           box-sizing: border-box;
-          background: url('/src/assets/bg.jpg') no-repeat center center fixed;
+          background: url('${bgImage}') no-repeat center center fixed;
           background-size: cover;
           display: flex;
           flex-direction: column;

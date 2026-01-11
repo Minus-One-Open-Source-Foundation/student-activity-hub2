@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaClock, FaCheck, FaTimes, FaSpinner, FaSearch } from "react-icons/fa";
 import { facultyAPI } from "../services/api";
+import bgImage from "../assets/bg.jpg";
 
 export default function Reports() {
   const [requests, setRequests] = useState([]);
@@ -324,7 +325,7 @@ export default function Reports() {
           min-height: 100vh;
           padding: 2rem;
           font-family: 'Inter', sans-serif;
-          background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+          background: url('${bgImage}') no-repeat center center fixed;
           background-size: cover;
           color: #111;
         }

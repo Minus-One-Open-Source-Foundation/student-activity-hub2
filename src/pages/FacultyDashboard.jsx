@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import bgImage from "../assets/bg.jpg";
 
 export default function FacultyDashboard() {
   const navigate = useNavigate();
@@ -127,7 +128,7 @@ export default function FacultyDashboard() {
             overflow-y: auto;
             padding: 2rem;
             font-family: 'Inter', sans-serif;
-            background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+            background: url('${bgImage}') no-repeat center center fixed;
             background-size: cover;
             position: relative;
           }
@@ -290,7 +291,7 @@ export default function FacultyDashboard() {
             overflow: visible;
             padding: 2rem;
             font-family: 'Inter', sans-serif;
-            background: url("/src/assets/bg.jpg") no-repeat center center fixed;
+            background: url('${bgImage}') no-repeat center center fixed;
             background-size: cover;
             color: #111;
           }

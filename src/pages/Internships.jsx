@@ -7,6 +7,7 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import { internshipAPI } from "../services/api";
+import bgImage from "../assets/bg.jpg";
 
 export default function Internships() {
   const [events, setEvents] = useState([]);
@@ -129,7 +130,7 @@ export default function Internships() {
         minHeight: "100vh",
         padding: "2rem 1rem",
         fontFamily: "'Inter', sans-serif",
-        background: `url("/src/assets/bg.jpg") no-repeat center center fixed`,
+        background: `url("${bgImage}") no-repeat center center fixed`,
         backgroundSize: "cover",
         color: "#111",
       }}

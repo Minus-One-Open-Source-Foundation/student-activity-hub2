@@ -75,6 +75,7 @@ api.deleteUserByEmail = async (email) => {
 };
 
 // Authentication API functions
+// Matches AuthController endpoints: @RequestMapping("/api/auth")
 export const authAPI = {
   login: async (email, password) => {
     try {
@@ -86,7 +87,9 @@ export const authAPI = {
     } catch (error) {
       // Handle HTTP error responses
       if (error.response) {
-        throw error.response.data;
+        // Extract error message from AuthResponse if available
+        const errorMessage = error.response.data?.message || 'Login failed';
+        throw new Error(errorMessage);
       }
       throw error;
     }

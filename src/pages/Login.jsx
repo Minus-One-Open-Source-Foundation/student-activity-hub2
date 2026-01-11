@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import bgImage from "../assets/bg.jpg";
 
 export default function Login() {
   const { login } = useAuth();
@@ -140,7 +141,7 @@ export default function Login() {
           /* Background image + gradient overlay */
           background-image: 
             linear-gradient(270deg, rgba(142,197,252,0.75), rgba(224,195,252,0.75), rgba(240,244,248,0.75), rgba(207,217,223,0.75)),
-            url("/src/assets/bg.jpg"); /* 👉 replace with your image path */
+            url("${bgImage}"); /* 👉 replace with your image path */
           background-size: 800% 800%, cover;
           background-position: center;
           background-attachment: fixed;
