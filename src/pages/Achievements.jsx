@@ -60,7 +60,7 @@ export default function Achievements() {
         fetchUserAchievements();
       } else {
         setLoading(false);
-        setError('Cannot connect to the backend server. Please ensure the server is running on http://98.70.26.80:8058');
+        setError(`Cannot connect to the backend server. Please ensure the server is running on ${import.meta.env.VITE_API_URL || 'the configured API URL'}`);
       }
     };
 
@@ -107,7 +107,7 @@ export default function Achievements() {
       } else if (err.response?.status === 500) {
         setError('Server error. Please try again later.');
       } else if (err.code === 'NETWORK_ERROR' || err.message.includes('Network Error')) {
-        setError('Cannot connect to server. Please check if the backend is running on http://98.70.26.80:8058');
+        setError(`Cannot connect to server. Please check if the backend is running on ${import.meta.env.VITE_API_URL || 'the configured API URL'}`);
       } else {
         setError(`Failed to load achievements: ${err.response?.data?.message || err.message}`);
       }
@@ -245,7 +245,7 @@ export default function Achievements() {
             <h4 style={{ margin: "0 0 0.5rem 0", color: "#495057" }}>🔧 Troubleshooting:</h4>
             <ul style={{ margin: 0, paddingLeft: "1.5rem", color: "#6c757d" }}>
               <li>Check if the backend server is running</li>
-              <li>Verify backend URL: <code>http://98.70.26.80:8058</code></li>
+              <li>Verify backend URL: <code>{import.meta.env.VITE_API_URL || 'Configured API URL'}</code></li>
               <li>Check browser console for detailed error logs</li>
               <li>Ensure you are logged in with a valid account</li>
             </ul>

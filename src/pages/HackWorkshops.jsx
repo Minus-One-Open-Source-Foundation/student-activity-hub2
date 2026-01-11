@@ -105,7 +105,7 @@ export default function HackWorkshops() {
       };
 
       console.log('Sending to backend:', eventData);
-      console.log('Backend URL: http://98.70.26.80:8058/api/events/create');
+      console.log(`Backend URL: ${import.meta.env.VITE_API_URL || ''}/api/events/create`);
       
       const response = await eventsAPI.createEvent(eventData, formData.file);
       console.log('Backend response:', response);

@@ -3,7 +3,11 @@ import axios from "axios";
 const api = axios.create({
   baseURL: (() => {
     let url = import.meta.env.VITE_API_URL;
-    if (!url) return 'http://localhost:8080/api';
+    // Fallback to localhost only if strictly necessary or removed per instruction
+    if (!url) {
+      console.warn('VITE_API_URL is not defined in .env');
+      return '/api'; // Relative path for proxy or similar
+    }
     if (!url.endsWith('/api')) {
       return url.endsWith('/') ? `${url}api` : `${url}/api`;
     }

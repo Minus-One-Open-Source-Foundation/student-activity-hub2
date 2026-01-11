@@ -1,6 +1,10 @@
 // src/activities.js
 const API_BASE = (() => {
-  let url = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  let url = import.meta.env.VITE_API_URL;
+  if (!url) {
+     console.warn("VITE_API_URL not set in .env");
+     return "";
+  }
   if (!url.endsWith('/api')) {
     return url.endsWith('/') ? `${url}api` : `${url}/api`;
   }

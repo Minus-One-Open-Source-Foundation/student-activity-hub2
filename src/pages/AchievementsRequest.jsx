@@ -179,7 +179,9 @@ export default function AchievementsRequest() {
               onClick={async () => {
                 try {
                   console.log('🧪 Testing backend connectivity...');
-                  const testResponse = await fetch('http://98.70.26.80:8058/api/achievements/faculty/all', {
+                  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+                  const apiUrl = baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
+                  const testResponse = await fetch(`${apiUrl}/achievements/faculty/all`, {
                     method: 'GET',
                     headers: {
                       'Authorization': `Bearer ${localStorage.getItem('token')}`,
