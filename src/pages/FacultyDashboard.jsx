@@ -78,7 +78,7 @@ export default function FacultyDashboard() {
       <div className="top-cards">
         <div className="card" onClick={() => navigate("/faculty/students")}>
           <h3>Student Management</h3>
-          <p>Manage student profiles and academic records</p>
+          <p>Manage student profiles</p>
         </div>
         <div className="card" onClick={() => navigate("/faculty/grades")}>
           <h3>Grade Management</h3>

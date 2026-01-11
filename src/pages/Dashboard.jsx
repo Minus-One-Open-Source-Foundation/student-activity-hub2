@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import jsPDF from "jspdf";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Dashboard() {
@@ -48,57 +47,6 @@ export default function Dashboard() {
 
   const achievements = activities.filter((a) => a.status === "Approved").length;
 
-  const handleDownloadPortfolio = () => {
-    let content = `Student Portfolio\n\n`;
-    content += `Name: ${personalInfo.name}\nDOB: ${personalInfo.dob}\nPhone: ${personalInfo.phone}\nAddress: ${personalInfo.address}\n\n`;
-    content += `--- Activities ---\n`;
-    activities.forEach((a) => {
-      content += `• ${a.title} (${a.category}) - ${a.status}\n   ${a.description}\n\n`;
-    });
-    const blob = new Blob([content], { type: "text/plain" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${personalInfo.name}_Portfolio.txt`;
-    link.click();
-  };
-
-  const generatePDF = () => {
-    const doc = new jsPDF();
-
-    // Add title
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.text("Professional Portfolio", 105, 20, { align: "center" });
-
-    // Add student details dynamically
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Name: ${user?.name || "N/A"}`, 20, 40);
-    doc.text(`Email: ${user?.email || "N/A"}`, 20, 50);
-    doc.text(`Phone: ${user?.phone || "N/A"}`, 20, 60);
-
-    // Add sections (example placeholders)
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("Achievements", 20, 80);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    activities.filter(a => a.status === "Approved").forEach((achievement, index) => {
-      doc.text(`- ${achievement.title}`, 20, 90 + (index * 10));
-    });
-
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("Academic Records", 20, 120);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text("- B.Tech in Computer Science, XYZ University", 20, 130);
-    doc.text("- GPA: 9.2/10", 20, 140);
-
-    // Save the PDF
-    doc.save("Portfolio.pdf");
-  };
-
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-content">
@@ -138,16 +86,6 @@ export default function Dashboard() {
             <p className="description">Manage your role-based resumes for different companies.</p>
           </div>
 
-          {/* Academic Records Card */}
-          <div
-            className="glass-card"
-            onClick={() => navigate("/academic-records")}
-            style={{ cursor: "pointer" }}
-            >
-            <h3>Academic Records</h3>
-            <p className="description">View your academic performance and records.</p>
-          </div>
-
           <div className="glass-card" onClick={() => navigate("/hackathons-workshops")} style={{ cursor: "pointer" }}>
             <h3>Hackathons & Workshops</h3>
             <p className="description">Explore your participation in hackathons and workshops.</p>
@@ -162,23 +100,8 @@ export default function Dashboard() {
             <h3>Approved Achievements</h3>
             <p className="description">Review your approved achievements and milestones.</p>
           </div>
-
-          {/* Analytics Card */}
-          <div
-            className="glass-card"
-            onClick={() => navigate("/analytics")}
-            style={{ cursor: "pointer" }}
-            >
-            <h3>Analytics</h3>
-            <p className="description">Analyze your performance and progress over time.</p>
-          </div>
         </div>
       </section>
-
-        {/* Download Button */}
-        <div className="download-btn">
-        <button className="primary-btn" onClick={generatePDF}>Download Portfolio</button>
-      </div>
 
       {/* Inline Styles */}
       <style>{`

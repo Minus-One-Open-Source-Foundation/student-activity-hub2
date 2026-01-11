@@ -81,7 +81,7 @@ export default function StudentManagement() {
     <div className="student-management">
       <header>
         <h1>Student Management</h1>
-        <p>Manage student details, profiles, and records</p>
+        <p>Manage student details and profiles</p>
       </header>
 
       {/* Search Bar */}
